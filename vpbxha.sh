@@ -888,7 +888,7 @@ skip-external-locking
 
 # Instead of skip-networking the default is now to listen only on
 # localhost which is more compatible and is not less secure.
-bind-address            = 127.0.0.1
+#bind-address            = 127.0.0.1
 
 #
 # * Fine Tuning
@@ -1039,7 +1039,7 @@ skip-external-locking
 
 # Instead of skip-networking the default is now to listen only on
 # localhost which is more compatible and is not less secure.
-bind-address            = 127.0.0.1
+#bind-address            = 127.0.0.1
 
 #
 # * Fine Tuning
@@ -1166,8 +1166,8 @@ create_hacluster_password:
 echo -e "************************************************************"
 echo -e "*     Create password for hacluster in Master/Standby      *"
 echo -e "************************************************************"
-echo $hapassword | passwd --stdin hacluster
-ssh root@$ip_standby "echo $hapassword | passwd --stdin hacluster"
+echo hacluster:$hapassword | chpasswd
+ssh root@$ip_standby "echo hacluster:$hapassword | chpasswd"
 echo -e "*** Done Step 7 ***"
 echo -e "7"	> step.txt
 
