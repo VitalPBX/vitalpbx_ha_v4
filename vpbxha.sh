@@ -1198,7 +1198,7 @@ creating_cluster:
 echo -e "************************************************************"
 echo -e "*              Creating Cluster in Master                  *"
 echo -e "************************************************************"
-pcs cluster setup --name cluster_vitalpbx $host_master $host_standby
+pcs cluster setup cluster_vitalpbx $host_master $host_standby --force
 echo -e "*** Done Step 10 ***"
 echo -e "10"	> step.txt
 
