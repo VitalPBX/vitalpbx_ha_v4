@@ -132,7 +132,7 @@ echo -e "*****************************************************************"
 		systemctl stop pcsd.service 
 		systemctl stop corosync.service 
 		systemctl stop pacemaker.service
-cat > /etc/profile.d/vitalwelcome.sh << EOF
+cat > /etc/update-motd.d/20-vitalpbx << EOF
 #!/bin/bash
 # This code is the property of VitalPBX LLC Company
 # License: Proprietary
@@ -141,20 +141,9 @@ cat > /etc/profile.d/vitalwelcome.sh << EOF
 #Bash Colour Codes
 green="\033[00;32m"
 txtrst="\033[00;0m"
-if [ -f /etc/redhat-release ]; then
-        linux_ver=\`cat /etc/redhat-release\`
-        vitalpbx_ver=\`rpm -qi vitalpbx |awk -F: '/^Version/ {print \$2}'\`
-        vitalpbx_release=\`rpm -qi vitalpbx |awk -F: '/^Release/ {print \$2}'\`
-elif [ -f /etc/debian_version ]; then
-        linux_ver="Debian "\`cat /etc/debian_version\`
-        vitalpbx_ver=\`dpkg -l vitalpbx |awk '/ombutel/ {print \$3}'\`
-else
-        linux_ver=""
-        vitalpbx_ver=""
-        vitalpbx_release=""
-fi
-vpbx_version="\${vitalpbx_ver}-\${vitalpbx_release}"
-asterisk_version=\`rpm -q --qf "%{VERSION}" asterisk\`
+linux_ver=`cat /etc/os-release | grep -e PRETTY_NAME | awk -F '=' '{print $2}' | xargs\`
+vitalpbx_ver=\`dpkg -l vitalpbx |awk '/vitalpbx/ {print \$3}'\`
+vpbx_version="${vitalpbx_ver}-${vitalpbx_release}"
 logo='
  _    _ _           _ ______ ______ _    _
 | |  | (_)_        | (_____ (____  \ \  / /
@@ -168,7 +157,7 @@ echo -e "
 \${logo}
 \${txtrst}
  Version        : \${vpbx_version//[[:space:]]}
- Asterisk       : \${asterisk_version}
+ Asterisk       : \`asterisk -rx "core show version" 2>/dev/null| grep -ohe 'Asterisk [0-9.]*'\`
  Linux Version  : \${linux_ver}
  Welcome to     : \`hostname\`
  Uptime         : \`uptime | grep -ohe 'up .*' | sed 's/up //g' | awk -F "," '{print \$1}'\`
@@ -179,9 +168,9 @@ echo -e "
  NTP Sync.      :\`timedatectl |awk -F: '/NTP sync/ {print \$2}'\`
 "
 EOF
-chmod 755 /etc/profile.d/vitalwelcome.sh
-scp /etc/profile.d/vitalwelcome.sh root@$ip_standby:/etc/profile.d/vitalwelcome.sh
-ssh root@$ip_standby "chmod 755 /etc/profile.d/vitalwelcome.sh"
+chmod 755 /etc/update-motd.d/20-vitalpbx
+scp /etc/update-motd.d/20-vitalpbx root@$ip_standby:/etc/update-motd.d/20-vitalpbx
+ssh root@$ip_standby "chmod 755 /etc/update-motd.d/20-vitalpbx"
 rm -rf /usr/local/bin/bascul		
 rm -rf /usr/local/bin/role
 ssh root@$ip_standby "rm -rf /usr/local/bin/bascul"
@@ -771,17 +760,17 @@ ssh root@$ip_standby "systemctl enable chrony"
 #Remove anonymous user from MySQL
 mysql -uroot -e "DELETE FROM mysql.user WHERE User='';"
 #Configuration of the First Master Server (Master-1)
-cat > /etc/my.cnf.d/vitalpbx.cnf << EOF
+cat > /etc/mysql/mariadb.conf.d/50-server.cnf << EOF
 [mysqld]
-server-id=1
-log-bin=mysql-bin
-report_host = master1
-innodb_buffer_pool_size = 64M
-innodb_flush_log_at_trx_commit = 2
-innodb_log_file_size = 64M
-innodb_log_buffer_size = 64M
-bulk_insert_buffer_size = 64M
-max_allowed_packet = 64M
+bind-address	= $ip_master
+
+server-id	= 1
+report_host	= master1
+log_bin		= /var/log/mysql/mariadb-bin
+log_bin_index	= /var/log/mysql/mariadb-bin.index
+
+relay_log	= /var/log/mysql/relay-bin
+relay_log_index	= /var/log/mysql/relay-bin.index
 EOF
 systemctl restart mariadb
 #Create a new user on the Master-1
@@ -806,17 +795,17 @@ ssh root@$ip_standby "/tmp/./mysqldump.sh"
 #Configuration of the Second Master Server (Master-2)
 cat > /tmp/vitalpbx.cnf << EOF
 [mysqld]
-server-id = 2
-log-bin=mysql-bin
-report_host = master2
-innodb_buffer_pool_size = 64M
-innodb_flush_log_at_trx_commit = 2
-innodb_log_file_size = 64M
-innodb_log_buffer_size = 64M
-bulk_insert_buffer_size = 64M
-max_allowed_packet = 64M
+bind-address	= $ip_slave
+
+server-id	= 2
+report_host	= master2
+log_bin		= /var/log/mysql/mariadb-bin
+log_bin_index	= /var/log/mysql/mariadb-bin.index
+
+relay_log	= /var/log/mysql/relay-bin
+relay_log_index	= /var/log/mysql/relay-bin.index
 EOF
-scp /tmp/vitalpbx.cnf root@$ip_standby:/etc/my.cnf.d/vitalpbx.cnf
+scp /tmp/50-server.cnf root@$ip_standby:/etc/mysql/mariadb.conf.d/50-server.cnf
 ssh root@$ip_standby "systemctl restart mariadb"
 #Create a new user on the Master-2
 cat > /tmp/grand.sh << EOF
@@ -1062,26 +1051,15 @@ cat > /usr/local/bin/role << EOF
 #Bash Colour Codes
 green="\033[00;32m"
 txtrst="\033[00;0m"
-if [ -f /etc/redhat-release ]; then
-        linux_ver=\`cat /etc/redhat-release\`
-        vitalpbx_ver=\`rpm -qi vitalpbx |awk -F: '/^Version/ {print \$2}'\`
-        vitalpbx_release=\`rpm -qi vitalpbx |awk -F: '/^Release/ {print \$2}'\`
-elif [ -f /etc/debian_version ]; then
-        linux_ver="Debian "\`cat /etc/debian_version\`
-        vitalpbx_ver=\`dpkg -l vitalpbx |awk '/ombutel/ {print \$3}'\`
-else
-        linux_ver=""
-        vitalpbx_ver=""
-        vitalpbx_release=""
-fi
-vpbx_version="\${vitalpbx_ver}-\${vitalpbx_release}"
-asterisk_version=\`rpm -q --qf "%{VERSION}" asterisk\`
+linux_ver=`cat /etc/os-release | grep -e PRETTY_NAME | awk -F '=' '{print $2}' | xargs\`
+vitalpbx_ver=\`dpkg -l vitalpbx |awk '/vitalpbx/ {print \$3}'\`
+vpbx_version="${vitalpbx_ver}-${vitalpbx_release}"
 server_master=\`pcs status resources | awk 'NR==1 {print \$4}'\`
 host=\`hostname\`
 if [[ "\${server_master}" = "\${host}" ]]; then
         server_mode="Master"
 else
-		server_mode="Standby"
+	server_mode="Standby"
 fi
 logo='
  _    _ _           _ ______ ______ _    _
@@ -1097,7 +1075,7 @@ echo -e "
 \${txtrst}
  Role           : \$server_mode
  Version        : \${vpbx_version//[[:space:]]}
- Asterisk       : \${asterisk_version}
+ Asterisk       : \`asterisk -rx "core show version" 2>/dev/null| grep -ohe 'Asterisk [0-9.]*'\`
  Linux Version  : \${linux_ver}
  Welcome to     : \`hostname\`
  Uptime         : \`uptime | grep -ohe 'up .*' | sed 's/up //g' | awk -F "," '{print \$1}'\`
@@ -1127,11 +1105,11 @@ ceate_welcome_message:
 echo -e "************************************************************"
 echo -e "*              Creating Welcome message                    *"
 echo -e "************************************************************"
-/bin/cp -rf /usr/local/bin/role /etc/profile.d/vitalwelcome.sh
+/bin/cp -rf /usr/local/bin/role /etc/update-motd.d/20-vitalpbx
 chmod 755 /etc/profile.d/vitalwelcome.sh
 echo -e "*** Done ***"
-scp /etc/profile.d/vitalwelcome.sh root@$ip_standby:/etc/profile.d/vitalwelcome.sh
-ssh root@$ip_standby "chmod 755 /etc/profile.d/vitalwelcome.sh"
+scp /etc/update-motd.d/20-vitalpbx root@$ip_standby:/etc/update-motd.d/20-vitalpbx
+ssh root@$ip_standby "chmod 755 /etc/update-motd.d/20-vitalpbx"
 echo -e "*** Done Step 18 END ***"
 echo -e "18"	> step.txt
 
