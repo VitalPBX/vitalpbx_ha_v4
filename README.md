@@ -24,7 +24,7 @@ f.- Both servers will not be able to have a proxy since this affects the communi
 ## Configurations
 We will configure in each server the hosname and IP address. Edit the following file with nano, /etc/network/interfaces<br>
 
-###Server 1
+### Server 1
 <pre>
 root@vitalpbx1:~# hostname vitalpbx1.local
 
@@ -44,7 +44,7 @@ netmask 255.255.255.0
 gateway 192.168.10.1
 </pre>
 
-###Server 2
+### Server 2
 <pre>
 root@vitalpbx2:~# hostname vitalpbx2.local
 
