@@ -22,7 +22,49 @@ e.- Root user is required for both servers to communicate.<br>
 f.- Both servers will not be able to have a proxy since this affects the communication between them.
 
 ## Configurations
-We will configure in each server the IP address and the host name. Go to the web interface to: <strong>Admin>System Settinngs>Network Settings</strong>.<br>
+We will configure in each server the IP address and the host name. Edit the following file with nano, /etc/network/interfaces<br>
+
+#Server 1
+<pre>
+[root@vitalpbx1 ~]# hostname vitalpbx1.local
+
+[root@vitalpbx1 ~]# nano /etc/network/interfaces
+
+Change
+#The primary network interface
+allow-hotplug eth0
+iface eth0 inet dchp
+
+With the following
+#The primary network interface
+allow-hotplug eth0
+iface eth0 inet static
+address 192.168.10.61
+netmask 255.255.255.0
+gateway 192.168.10.1
+</pre>
+
+#Server 2
+<pre>
+[root@vitalpbx2 ~]# hostname vitalpbx2.local
+
+[root@vitalpbx2 ~]# nano /etc/network/interfaces
+
+Change
+#The primary network interface
+allow-hotplug eth0
+iface eth0 inet dchp
+
+With the following
+#The primary network interface
+allow-hotplug eth0
+iface eth0 inet static
+address 192.168.10.62
+netmask 255.255.255.0
+gateway 192.168.10.1
+</pre>
+
+Go to the web interface to: <strong>Admin>System Settinngs>Network Settings</strong>.<br>
 First change the Hostname, remember press the <strong>Check</strong> button.<br>
 Disable the DHCP option and set these values<br>
 
