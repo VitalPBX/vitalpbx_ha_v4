@@ -81,8 +81,8 @@ Also do it in SETTINGS/SIP Settings Tab NETWORK fields "TCP Bind Address" and "T
 ## Install Dependencies
 Install the necessary dependencies on both servers<br>
 <pre>
-root@vitalpbx1:~# apt -y install corosync pacemaker pcs lsyncd
-root@vitalpbx2:~# apt -y install corosync pacemaker pcs lsyncd
+root@vitalpbx1:~# apt -y install corosync pacemaker pcs lsyncd chrony
+root@vitalpbx2:~# apt -y install corosync pacemaker pcs lsyncd chrony
 </pre>
 
 ## Create authorization key for the Access between the two servers without credentials
