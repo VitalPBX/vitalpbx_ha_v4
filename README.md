@@ -122,7 +122,7 @@ Now copy and run the following script<br>
 <pre>
 root@vitalpbx<strong>1</strong>:~# mkdir /usr/share/vitalpbx/ha
 root@vitalpbx<strong>1</strong>:~# cd /usr/share/vitalpbx/ha
-root@vitalpbx<strong>1</strong>:~# wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha/master/vpbxha.sh
+root@vitalpbx<strong>1</strong>:~# wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/master/vpbxha.sh
 root@vitalpbx<strong>1</strong>:~# chmod +x vpbxha.sh
 root@vitalpbx<strong>1</strong>:~# ./vpbxha.sh
 
