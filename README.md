@@ -22,13 +22,13 @@ e.- Root user is required for both servers to communicate.<br>
 f.- Both servers will not be able to have a proxy since this affects the communication between them.
 
 ## Configurations
-We will configure in each server the IP address and the host name. Edit the following file with nano, /etc/network/interfaces<br>
+We will configure in each server the hosname and IP address. Edit the following file with nano, /etc/network/interfaces<br>
 
 #Server 1
 <pre>
-[root@vitalpbx1 ~]# hostname vitalpbx1.local
+root@vitalpbx1:~# hostname vitalpbx1.local
 
-[root@vitalpbx1 ~]# nano /etc/network/interfaces
+root@vitalpbx1:~# nano /etc/network/interfaces
 
 Change
 #The primary network interface
@@ -46,9 +46,9 @@ gateway 192.168.10.1
 
 #Server 2
 <pre>
-[root@vitalpbx2 ~]# hostname vitalpbx2.local
+root@vitalpbx2:~# hostname vitalpbx2.local
 
-[root@vitalpbx2 ~]# nano /etc/network/interfaces
+root@vitalpbx2:~# nano /etc/network/interfaces
 
 Change
 #The primary network interface
@@ -81,8 +81,8 @@ Also do it in SETTINGS/SIP Settings Tab NETWORK fields "TCP Bind Address" and "T
 ## Install Dependencies
 Install the necessary dependencies on both servers<br>
 <pre>
-[root@vitalpbx1 ~]# apt -y install corosync pacemaker pcs lsyncd
-[root@vitalpbx2 ~]# apt -y install corosync pacemaker pcs lsyncd
+root@vitalpbx1:~# apt -y install corosync pacemaker pcs lsyncd
+root@vitalpbx2:~# apt -y install corosync pacemaker pcs lsyncd
 </pre>
 
 ## Create authorization key for the Access between the two servers without credentials
