@@ -64,9 +64,6 @@ netmask 255.255.255.0
 gateway 192.168.10.1
 </pre>
 
-Go to the web interface to: <strong>Admin>System Settinngs>Network Settings</strong>.<br>
-First change the Hostname, remember press the <strong>Check</strong> button.<br>
-Disable the DHCP option and set these values<br>
 
 | Name          | Master                 | Standby               |
 | ------------- | ---------------------- | --------------------- |
