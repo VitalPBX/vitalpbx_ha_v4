@@ -89,8 +89,8 @@ root@vitalpbx2:~# apt -y install corosync pacemaker pcs lsyncd
 
 Create key in Server <strong>1</strong>
 <pre>
-[root@vitalpbx<strong>1</strong> ~]# ssh-keygen -f /root/.ssh/id_rsa -t rsa -N '' >/dev/null
-[root@vitalpbx<strong>1</strong> ~]# ssh-copy-id root@<strong>192.168.10.62</strong>
+root@vitalpbx<strong>1</strong>:~# ssh-keygen -f /root/.ssh/id_rsa -t rsa -N '' >/dev/null
+root@vitalpbx<strong>1</strong>:~# ssh-copy-id root@<strong>192.168.10.62</strong>
 Are you sure you want to continue connecting (yes/no)? <strong>yes</strong>
 root@192.168.10.62's password: <strong>(remote server root’s password)</strong>
 
@@ -99,13 +99,13 @@ Number of key(s) added: 1
 Now try logging into the machine, with:   "ssh 'root@192.168.10.62'"
 and check to make sure that only the key(s) you wanted were added. 
 
-[root@vitalpbx<strong>1</strong> ~]#
+root@vitalpbx<strong>1</strong>:~#
 </pre>
 
 Create key in Server <strong>2</strong>
 <pre>
-[root@vitalpbx<strong>2</strong> ~]# ssh-keygen -f /root/.ssh/id_rsa -t rsa -N '' >/dev/null
-[root@vitalpbx<strong>2</strong> ~]# ssh-copy-id root@<strong>192.168.10.61</strong>
+root@vitalpbx<strong>2</strong>:~# ssh-keygen -f /root/.ssh/id_rsa -t rsa -N '' >/dev/null
+root@vitalpbx<strong>2</strong>:~# ssh-copy-id root@<strong>192.168.10.61</strong>
 Are you sure you want to continue connecting (yes/no)? <strong>yes</strong>
 root@192.168.10.61's password: <strong>(remote server root’s password)</strong>
 
@@ -114,17 +114,17 @@ Number of key(s) added: 1
 Now try logging into the machine, with:   "ssh 'root@192.168.10.61'"
 and check to make sure that only the key(s) you wanted were added. 
 
-[root@vitalpbx<strong>2</strong> ~]#
+root@vitalpbx<strong>2</strong>:~#
 </pre>
 
 ## Script
 Now copy and run the following script<br>
 <pre>
-[root@ vitalpbx<strong>1</strong> ~]# mkdir /usr/share/vitalpbx/ha
-[root@ vitalpbx<strong>1</strong> ~]# cd /usr/share/vitalpbx/ha
-[root@ vitalpbx<strong>1</strong> ~]# wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha/master/vpbxha.sh
-[root@ vitalpbx<strong>1</strong> ~]# chmod +x vpbxha.sh
-[root@ vitalpbx<strong>1</strong> ~]# ./vpbxha.sh
+root@vitalpbx<strong>1</strong>:~# mkdir /usr/share/vitalpbx/ha
+root@vitalpbx<strong>1</strong>:~# cd /usr/share/vitalpbx/ha
+root@vitalpbx<strong>1</strong>:~# wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha/master/vpbxha.sh
+root@vitalpbx<strong>1</strong>:~# chmod +x vpbxha.sh
+root@vitalpbx<strong>1</strong>:~# ./vpbxha.sh
 
 ************************************************************
 *  Welcome to the VitalPBX high availability installation  *
