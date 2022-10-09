@@ -1429,14 +1429,14 @@ echo -e "************************************************************"
 echo -e "*              Creating Welcome message                    *"
 echo -e "************************************************************"
 /bin/cp -rf /usr/local/bin/role /etc/update-motd.d/20-vitalpbx
-chmod 755 /etc/profile.d/vitalwelcome.sh
+chmod 755 /etc/update-motd.d/20-vitalpbx
 echo -e "*** Done ***"
 scp /etc/update-motd.d/20-vitalpbx root@$ip_standby:/etc/update-motd.d/20-vitalpbx
 ssh root@$ip_standby "chmod 755 /etc/update-motd.d/20-vitalpbx"
 echo -e "*** Done Step 18 END ***"
 echo -e "18"	> step.txt
 
-wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha/master/mariadbfix
+wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/master/mariadbfix
 yes | cp -fr mariadbfix /usr/local/bin/mariadbfix
 yes | cp -fr config.txt /usr/local/bin/config.txt
 chmod +x /usr/local/bin/mariadbfix
