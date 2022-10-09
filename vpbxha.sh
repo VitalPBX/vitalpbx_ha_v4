@@ -1190,7 +1190,7 @@ auth_hacluster:
 echo -e "************************************************************"
 echo -e "*            Server Authenticate in Master                 *"
 echo -e "************************************************************"
-pcs cluster auth $host_master $host_standby -u hacluster -p $hapassword
+pcs host auth $host_master $host_standby -u hacluster -p $hapassword
 echo -e "*** Done Step 9 ***"
 echo -e "9"	> step.txt
 
