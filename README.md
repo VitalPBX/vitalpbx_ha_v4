@@ -91,7 +91,7 @@ Create key in Server <strong>1</strong>
 <pre>
 root@vitalpbx<strong>1</strong>:~# ssh-keygen -f /root/.ssh/id_rsa -t rsa -N '' >/dev/null
 root@vitalpbx<strong>1</strong>:~# ssh-copy-id root@<strong>192.168.10.62</strong>
-Are you sure you want to continue connecting (yes/no)? <strong>yes</strong>
+Are you sure you want to continue connecting (yes/no/[fingerprint])? <strong>yes</strong>
 root@192.168.10.62's password: <strong>(remote server root’s password)</strong>
 
 Number of key(s) added: 1
@@ -106,7 +106,7 @@ Create key in Server <strong>2</strong>
 <pre>
 root@vitalpbx<strong>2</strong>:~# ssh-keygen -f /root/.ssh/id_rsa -t rsa -N '' >/dev/null
 root@vitalpbx<strong>2</strong>:~# ssh-copy-id root@<strong>192.168.10.61</strong>
-Are you sure you want to continue connecting (yes/no)? <strong>yes</strong>
+Are you sure you want to continue connecting (yes/no/[fingerprint])? <strong>yes</strong>
 root@192.168.10.61's password: <strong>(remote server root’s password)</strong>
 
 Number of key(s) added: 1
