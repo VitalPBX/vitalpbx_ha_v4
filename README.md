@@ -9,7 +9,7 @@ Make a high-availability cluster out of any pair of VitalPBX servers. VitalPBX c
 - The VitalPBX team does not provide support for systems in an HA environment because it is not possible to determine the environment where it has been installed.
 
 ## Example:<br>
-![VitalPBX HA](https://github.com/VitalPBX/vitalpbx_ha/blob/master/HAReplica2Servers.png)
+![VitalPBX HA](https://github.com/VitalPBX/vitalpbx_ha_v4/blob/main/HAReplica2Servers.png)
 
 -----------------
 ## Prerequisites
