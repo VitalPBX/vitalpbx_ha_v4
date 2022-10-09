@@ -763,6 +763,11 @@ create_mariadb_replica:
 echo -e "************************************************************"
 echo -e "*                Create mariadb replica                    *"
 echo -e "************************************************************"
+#Enable chrony service
+systemctl start chrony
+systemctl enable chrony
+ssh root@$ip_standby "systemctl start chrony"
+ssh root@$ip_standby "systemctl enable chrony"
 #Remove anonymous user from MySQL
 mysql -uroot -e "DELETE FROM mysql.user WHERE User='';"
 #Configuration of the First Master Server (Master-1)
