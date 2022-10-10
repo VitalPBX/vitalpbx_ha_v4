@@ -553,24 +553,26 @@ cat > /etc/lsyncd/lsyncd.conf.lua << EOF
 --
 settings {
 		logfile    = "/var/log/lsyncd/lsyncd.log",
-		statusFile = "/var/log/lsyncd/lsyncd-status.log",
+		statusFile = "/var/log/lsyncd/lsyncd.status",
 		statusInterval = 20,
-		nodaemon   = true,
+		nodaemon   = false,
 		insist = true,
 }
 sync {
-		default.rsync,
-		source="/var/spool/asterisk/monitor",
-		target="$ip_standby:/var/spool/asterisk/monitor",
-		rsync={
+		default.rsyncssh,
+		source = "/var/spool/asterisk/monitor",
+		host = "$ip_standby",
+		targetdir = "/var/spool/asterisk/monitor",
+		rsync = {
 				owner = true,
 				group = true
 		}
 }
 sync {
-		default.rsync,
-		source="/var/lib/asterisk/",
-		target="$ip_standby:/var/lib/asterisk/",
+		default.rsyncssh,
+		source = "/var/lib/asterisk/",
+		host = "$ip_standby",
+		targetdir = "/var/lib/asterisk/",
 		rsync = {
 				binary = "/usr/bin/rsync",
 				owner = true,
@@ -583,9 +585,10 @@ sync {
 				}
 }
 sync {
-		default.rsync,
-		source="/usr/share/vitxi/backend/",
-		target="$ip_standby:/usr/share/vitxi/backend/",
+		default.rsyncssh,
+		source = "/usr/share/vitxi/backend/",
+		host = "$ip_standby",
+		targetdir = "/usr/share/vitxi/backend/",
 		rsync = {
 				binary = "/usr/bin/rsync",
 				owner = true,
@@ -598,18 +601,20 @@ sync {
 				}
 }
 sync {
-		default.rsync,
-		source="/usr/share/vitxi/backend/storage/",
-		target="$ip_standby:/usr/share/vitxi/backend/storage/",
-		rsync={
+		default.rsyncssh,
+		source = "/usr/share/vitxi/backend/storage/",
+		host = "$ip_standby",
+		targetdir = "/usr/share/vitxi/backend/storage/",
+		rsync = {
 				owner = true,
 				group = true
 		}
 }
 sync {
-		default.rsync,
-		source="/var/lib/vitxi/",
-		target="$ip_standby:/var/lib/vitxi/",
+		default.rsyncssh,
+		source = "/var/lib/vitxi/",
+		host = "$ip_standby",
+		targetdir = "/var/lib/vitxi/",
 		rsync = {
 				binary = "/usr/bin/rsync",
 				owner = true,
@@ -622,36 +627,40 @@ sync {
 				}
 }
 sync {
-		default.rsync,
-		source="/var/lib/asterisk/agi-bin/",
-		target="$ip_standby:/var/lib/asterisk/agi-bin/",
-		rsync={
+		default.rsyncssh,
+		source = "/var/lib/asterisk/agi-bin/",
+		host = "$ip_standby",
+		targetdir = "/var/lib/asterisk/agi-bin/",
+		rsync = {
 				owner = true,
 				group = true
 		}
 }
 sync {
-		default.rsync,
-		source="/var/lib/asterisk/priv-callerintros/",
-		target="$ip_standby:/var/lib/asterisk/priv-callerintros",
-		rsync={
+		default.rsyncssh,
+		source = "/var/lib/asterisk/priv-callerintros/",
+		host = "$ip_standby",
+		targetdir = "/var/lib/asterisk/priv-callerintros",
+		rsync = {
 				owner = true,
 				group = true
 		}
 }
 sync {
-		default.rsync,
-		source="/var/lib/asterisk/sounds/",
-		target="$ip_standby:/var/lib/asterisk/sounds/",
-		rsync={
+		default.rsyncssh,
+		source = "/var/lib/asterisk/sounds/",
+		host = "$ip_standby",
+		targetdir = "/var/lib/asterisk/sounds/",
+		rsync = {
 				owner = true,
 				group = true
 		}
 }
 sync {
-		default.rsync,
-		source="/var/lib/vitalpbx",
-		target="$ip_standby:/var/lib/vitalpbx",
+		default.rsyncssh,
+		source = "/var/lib/vitalpbx",
+		host = "$ip_standby",
+		targetdir = "/var/lib/vitalpbx",
 		rsync = {
 				binary = "/usr/bin/rsync",
 				owner = true,
@@ -666,10 +675,11 @@ sync {
 				}
 }
 sync {
-		default.rsync,
-		source="/etc/asterisk",
-		target="$ip_standby:/etc/asterisk",
-		rsync={
+		default.rsyncssh,
+		source = "/etc/asterisk",
+		host = "$ip_standby",
+		targetdir = "/etc/asterisk",
+		rsync = {
 				owner = true,
 				group = true
 		}
@@ -687,25 +697,27 @@ cat > /tmp/lsyncd.conf.lua << EOF
 -- Simple example for default rsync.
 --
 settings {
-		logfile    = "/var/log/lsyncd/lsyncd.log",
+		logfile = "/var/log/lsyncd/lsyncd.log",
 		statusFile = "/var/log/lsyncd/lsyncd-status.log",
 		statusInterval = 20,
-		nodaemon   = true,
+		nodaemon = false,
 		insist = true,
 }
 sync {
-		default.rsync,
-		source="/var/spool/asterisk/monitor",
-		target="$ip_master:/var/spool/asterisk/monitor",
-		rsync={
+		default.rsyncssh,
+		source = "/var/spool/asterisk/monitor",
+		host = "$ip_master",
+		targetdir = "/var/spool/asterisk/monitor",
+		rsync = {
 				owner = true,
 				group = true
 		}
 }
 sync {
-		default.rsync,
-		source="/var/lib/asterisk/",
-		target="$ip_master:/var/lib/asterisk/",
+		default.rsyncssh,
+		source = "/var/lib/asterisk/",
+		host = "$ip_master",
+		targetdir = "/var/lib/asterisk/",
 		rsync = {
 				binary = "/usr/bin/rsync",
 				owner = true,
@@ -718,9 +730,10 @@ sync {
 				}
 }
 sync {
-		default.rsync,
-		source="/usr/share/vitxi/backend/",
-		target="$ip_master:/usr/share/vitxi/backend/",
+		default.rsyncssh,
+		source = "/usr/share/vitxi/backend/",
+		host = "$ip_master",
+		targetdir = "/usr/share/vitxi/backend/",
 		rsync = {
 				binary = "/usr/bin/rsync",
 				owner = true,
@@ -733,18 +746,20 @@ sync {
 				}
 }
 sync {
-		default.rsync,
-		source="/usr/share/vitxi/backend/storage/",
-		target="$ip_master:/usr/share/vitxi/backend/storage/",
-		rsync={
+		default.rsyncssh,
+		source = "/usr/share/vitxi/backend/storage/",
+		host = "$ip_master",
+		targetdir = "/usr/share/vitxi/backend/storage/",
+		rsync = {
 				owner = true,
 				group = true
 		}
 }
 sync {
-		default.rsync,
-		source="/var/lib/vitxi/",
-		target="$ip_master:/var/lib/vitxi/",
+		default.rsyncssh,
+		source = "/var/lib/vitxi/",
+		host = "$ip_master",
+		targetdir = "/var/lib/vitxi/",
 		rsync = {
 				binary = "/usr/bin/rsync",
 				owner = true,
@@ -757,36 +772,40 @@ sync {
 				}
 }
 sync {
-		default.rsync,
-		source="/var/lib/asterisk/agi-bin/",
-		target="$ip_master:/var/lib/asterisk/agi-bin/",
-		rsync={
+		default.rsyncssh,
+		source = "/var/lib/asterisk/agi-bin/",
+		host = "$ip_master",
+		targetdir = "/var/lib/asterisk/agi-bin/",
+		rsync = {
 				owner = true,
 				group = true
 		}
 }
 sync {
-		default.rsync,
-		source="/var/lib/asterisk/priv-callerintros/",
-		target="$ip_master:/var/lib/asterisk/priv-callerintros",
-		rsync={
+		default.rsyncssh,
+		source = "/var/lib/asterisk/priv-callerintros/",
+		host = "$ip_master",
+		targetdir = "/var/lib/asterisk/priv-callerintros",
+		rsync = {
 				owner = true,
 				group = true
 		}
 }
 sync {
-		default.rsync,
-		source="/var/lib/asterisk/sounds/",
-		target="$ip_master:/var/lib/asterisk/sounds/",
-		rsync={
+		default.rsyncssh,
+		source = "/var/lib/asterisk/sounds/",
+		host = "$ip_master",
+		targetdir =  "/var/lib/asterisk/sounds/",
+		rsync = {
 				owner = true,
 				group = true
 		}
 }
 sync {
-		default.rsync,
-		source="/var/lib/vitalpbx",
-		target="$ip_master:/var/lib/vitalpbx",
+		default.rsyncssh,
+		source = "/var/lib/vitalpbx",
+		host = "$ip_master",
+		targetdir = "/var/lib/vitalpbx",
 		rsync = {
 				binary = "/usr/bin/rsync",
 				owner = true,
@@ -801,10 +820,11 @@ sync {
 				}
 }
 sync {
-		default.rsync,
-		source="/etc/asterisk",
-		target="$ip_master:/etc/asterisk",
-		rsync={
+		default.rsyncssh,
+		source = "/etc/asterisk",
+		host = "$ip_master",
+		targetdir = "/etc/asterisk",
+		rsync = {
 				owner = true,
 				group = true
 		}
