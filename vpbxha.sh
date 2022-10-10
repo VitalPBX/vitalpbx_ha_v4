@@ -1365,7 +1365,8 @@ vitalpbx_create_role:
 echo -e "************************************************************"
 echo -e "*         Creating VitalPBX Cluster role Command           *"
 echo -e "************************************************************"
-wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/main/role /usr/local/bin/role
+wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/main/role
+yes | cp -fr role /usr/local/bin/role
 chmod +x /usr/local/bin/role
 scp /usr/local/bin/role root@$ip_standby:/usr/local/bin/role
 ssh root@$ip_standby 'chmod +x /usr/local/bin/role'
