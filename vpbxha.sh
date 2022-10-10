@@ -537,12 +537,15 @@ ssh root@$ip_standby "chown -R www-data:www-data /usr/share/vitxi/backend/storag
 ssh root@$ip_standby [[ ! -d /var/lib/vitxi ]] && ssh root@$ip_standby "mkdir /var/lib/vitxi" || echo "Path exist";
 ssh root@$ip_standby "chown -R www-data:www-data /var/lib/vitxi"
 
+if [ ! -d "/etc/lsyncd" ] ;then
+	mkdir /etc/lsyncd
+fi
 if [ ! -d "/var/log/lsyncd" ] ;then
 	mkdir /var/log/lsyncd
 	touch /var/log/lsyncd/lsyncd.{log,status}
 fi
 
-cat > /etc/lsyncd.conf << EOF
+cat > /etc/lsyncd/lsyncd.conf.lua << EOF
 ----
 -- User configuration file for lsyncd.
 --
@@ -672,7 +675,12 @@ sync {
 		}
 }
 EOF
-cat > /tmp/lsyncd.conf << EOF
+
+ssh root@$ip_standby [[ ! -d /etc/lsyncd ]] && ssh root@$ip_standby "mkdir /etc/lsyncd" || echo "Path exist";
+ssh root@$ip_standby [[ ! -d /var/log/lsyncd ]] && ssh root@$ip_standby "mkdir /var/log/lsyncd" || echo "Path exist";
+ssh root@$ip_standby "touch /var/log/lsyncd/lsyncd.{log,status}"
+
+cat > /tmp/lsyncd.conf.lua << EOF
 ----
 -- User configuration file for lsyncd.
 --
@@ -802,7 +810,7 @@ sync {
 		}
 }
 EOF
-scp /tmp/lsyncd.conf root@$ip_standby:/etc/lsyncd.conf
+scp /tmp/lsyncd.conf.lua root@$ip_standby:/etc/lsyncd/lsyncd.conf.lua
 echo -e "*** Done Step 5 ***"
 echo -e "5"	> step.txt
 
