@@ -515,27 +515,32 @@ if [ ! -d "/usr/share/vitxi" ] ;then
 	mkdir /usr/share/vitxi/backend
 	mkdir /usr/share/vitxi/backend/storage
 fi
-chown -R apache:apache /usr/share/vitxi
+chown -R www-data:www-data /usr/share/vitxi
 
 if [ ! -d "/var/lib/vitxi" ] ;then
 	mkdir /var/lib/vitxi
 fi
-chown -R apache:apache /var/lib/vitxi
+chown -R www-data:www-data /var/lib/vitxi
 
 ssh root@$ip_standby [[ ! -d /var/spool/asterisk/monitor ]] && ssh root@$ip_standby "mkdir /var/spool/asterisk/monitor" || echo "Path exist";
 ssh root@$ip_standby "chown -R asterisk:asterisk /var/spool/asterisk/monitor"
 
 ssh root@$ip_standby [[ ! -d /usr/share/vitxi ]] && ssh root@$ip_standby "mkdir /usr/share/vitxi" || echo "Path exist";
-ssh root@$ip_standby "chown -R apache:apache /usr/share/vitxi"
+ssh root@$ip_standby "chown -R www-data:www-data /usr/share/vitxi"
 
 ssh root@$ip_standby [[ ! -d /usr/share/vitxi/backend ]] && ssh root@$ip_standby "mkdir /usr/share/vitxi/backend" || echo "Path exist";
-ssh root@$ip_standby "chown -R apache:apache /usr/share/vitxi/backend"
+ssh root@$ip_standby "chown -R www-data:www-data /usr/share/vitxi/backend"
 
 ssh root@$ip_standby [[ ! -d /usr/share/vitxi/backend/storage ]] && ssh root@$ip_standby "mkdir /usr/share/vitxi/backend/storage" || echo "Path exist";
-ssh root@$ip_standby "chown -R apache:apache /usr/share/vitxi/backend/storage"
+ssh root@$ip_standby "chown -R www-data:www-data /usr/share/vitxi/backend/storage"
 
 ssh root@$ip_standby [[ ! -d /var/lib/vitxi ]] && ssh root@$ip_standby "mkdir /var/lib/vitxi" || echo "Path exist";
-ssh root@$ip_standby "chown -R apache:apache /var/lib/vitxi"
+ssh root@$ip_standby "chown -R www-data:www-data /var/lib/vitxi"
+
+if [ ! -d "/var/log/lsyncd" ] ;then
+	mkdir /var/log/lsyncd
+	touch /var/log/lsyncd/lsyncd.{log,status}
+fi
 
 cat > /etc/lsyncd.conf << EOF
 ----
