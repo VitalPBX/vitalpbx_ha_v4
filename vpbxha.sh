@@ -1241,87 +1241,8 @@ vitalpbx_create_bascul:
 echo -e "************************************************************"
 echo -e "*         Creating VitalPBX Cluster bascul Command         *"
 echo -e "************************************************************"
-cat > /usr/local/bin/bascul << EOF
-#!/bin/bash
-# This code is the property of VitalPBX LLC Company
-# License: Proprietary
-# Date: 30-Sep-2022
-# Change the status of the servers, the Master goes to Stanby and the Standby goes to Master.
-#funtion for draw a progress bar
-#You must pass as argument the amount of secconds that the progress bar will run
-#progress-bar 10 --> it will generate a progress bar that will run per 10 seconds
-set -e
-progress-bar() {
-        local duration=\${1}
-        already_done() { for ((done=0; done<\$elapsed; done++)); do printf ">"; done }
-        remaining() { for ((remain=\$elapsed; remain<\$duration; remain++)); do printf " "; done }
-        percentage() { printf "| %s%%" \$(( ((\$elapsed)*100)/(\$duration)*100/100 )); }
-        clean_line() { printf "\r"; }
-        for (( elapsed=1; elapsed<=\$duration; elapsed++ )); do
-                already_done; remaining; percentage
-                sleep 1
-                clean_line
-        done
-        clean_line
-}
-server_a=\`pcs status | awk 'NR==10 {print \$3}'\`
-server_b=\`pcs status | awk 'NR==10 {print \$4}'\`
-server_master=\`pcs status resources | awk 'NR==1 {print \$4}'\`
-#Perform some validations
-if [ "\${server_a}" = "" ] || [ "\${server_b}" = "" ]
-then
-    echo -e "\e[41m There are problems with high availability, please check with the command *pcs status* (we recommend applying the command *pcs cluster unstandby* in both servers) \e[0m"
-    exit;
-fi
-if [[ "\${server_master}" = "\${server_a}" ]]; then
-        host_master=\$server_a
-        host_standby=\$server_b
-else
-        host_master=\$server_b
-        host_standby=\$server_a
-fi
-arg=\$1
-if [ "\$arg" = 'yes' ] ;then
-	perform_bascul='yes'
-fi
-# Print a warning message and ask to the user if he wants to continue
-echo -e "************************************************************"
-echo -e "*     Change the roles of servers in high availability     *"
-echo -e "*\e[41m WARNING-WARNING-WARNING-WARNING-WARNING-WARNING-WARNING  \e[0m*"
-echo -e "*All calls in progress will be lost and the system will be *"
-echo -e "*     be in an unavailable state for a few seconds.        *"
-echo -e "************************************************************"
-#Perform a loop until the users confirm if wants to proceed or not
-while [[ \$perform_bascul != yes && \$perform_bascul != no ]]; do
-        read -p "Are you sure to switch from \$host_master to \$host_standby? (yes,no) > " perform_bascul
-done
-if [[ "\${perform_bascul}" = "yes" ]]; then
-        #Unstandby both nodes
-        pcs cluster unstandby \$host_master
-        pcs cluster unstandby \$host_standby
-        #Do a loop per resource
-        pcs status resources | grep "^s.*s(.*):s.*" | awk '{print \$1}' | while read -r resource ; do
-                #Skip moving the virutal_ip resource, it will be moved at the end
-                if [[ "\${resource}" != "virtual_ip" ]]; then
-                        echo "Moving \${resource} from \${host_master} to \${host_standby}"
-                        pcs resource move ${resource} \${host_standby}
-                fi
-        done
-        sleep 5 && pcs cluster standby \$host_master & #Standby current Master node after five seconds
-        sleep 20 && pcs cluster unstandby \$host_master & #Automatically Unstandby current Master node after$
-        #Move the Virtual IP resource to standby node
-        echo "Moving virutal_ip from \${host_master} to \${host_standby}"
-        pcs resource move virtual_ip \${host_standby}
-        #End the script
-        echo "Becoming \${host_standby} to Master"
-        progress-bar 10
-        echo "Done"
-else
-        echo "Nothing to do, bye, bye"
-fi
-sleep 5
-role
-EOF
+wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/main/bascul
+yes | cp -fr role /usr/local/bin/bascul
 chmod +x /usr/local/bin/bascul
 scp /usr/local/bin/bascul root@$ip_standby:/usr/local/bin/bascul
 ssh root@$ip_standby 'chmod +x /usr/local/bin/bascul'
