@@ -132,42 +132,9 @@ echo -e "*****************************************************************"
 		systemctl stop pcsd.service 
 		systemctl stop corosync.service 
 		systemctl stop pacemaker.service
-cat > /etc/update-motd.d/20-vitalpbx << EOF
-#!/bin/bash
-# This code is the property of VitalPBX LLC Company
-# License: Proprietary
-# Date: 30-Sep-2022
-# Show the Role of Server.
-#Bash Colour Codes
-green="\033[00;32m"
-txtrst="\033[00;0m"
-linux_ver=`cat /etc/os-release | grep -e PRETTY_NAME | awk -F '=' '{print $2}' | xargs\`
-vitalpbx_ver=\`dpkg -l vitalpbx |awk '/vitalpbx/ {print \$3}'\`
-vpbx_version="${vitalpbx_ver}-${vitalpbx_release}"
-logo='
- _    _ _           _ ______ ______ _    _
-| |  | (_)_        | (_____ (____  \ \  / /
-| |  | |_| |_  ____| |_____) )___)  ) \/ /
- \ \/ /| |  _)/ _  | |  ____/  __  ( )  (
-  \  / | | |_( ( | | | |    | |__)  ) /\ \\
-   \/  |_|\___)_||_|_|_|    |______/_/  \_\\
-'
-echo -e "
-\${green}
-\${logo}
-\${txtrst}
- Version        : \${vpbx_version//[[:space:]]}
- Asterisk       : \`asterisk -rx "core show version" 2>/dev/null| grep -ohe 'Asterisk [0-9.]*'\`
- Linux Version  : \${linux_ver}
- Welcome to     : \`hostname\`
- Uptime         : \`uptime | grep -ohe 'up .*' | sed 's/up //g' | awk -F "," '{print \$1}'\`
- Load           : \`uptime | grep -ohe 'load average[s:][: ].*' | awk '{ print "Last Minute: " \$3" Last 5 Minutes: "\$4" Last 15 Minutes: "\$5 }'\`
- Users          : \`uptime | grep -ohe '[0-9.*] user[s,]'\`
- IP Address     : \${green}\`ip addr | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | xargs\`\${txtrst}
- Clock          :\`timedatectl | sed -n '/Local time/ s/^[ \t]*Local time:\(.*$\)/\1/p'\`
- NTP Sync.      :\`timedatectl |awk -F: '/NTP sync/ {print \$2}'\`
-"
-EOF
+
+wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/main/welcome
+yes | cp -fr welcome /usr/local/bin/role /etc/update-motd.d/20-vitalpbx
 chmod 755 /etc/update-motd.d/20-vitalpbx
 scp /etc/update-motd.d/20-vitalpbx root@$ip_standby:/etc/update-motd.d/20-vitalpbx
 ssh root@$ip_standby "chmod 755 /etc/update-motd.d/20-vitalpbx"
