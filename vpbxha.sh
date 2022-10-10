@@ -1365,59 +1365,7 @@ vitalpbx_create_role:
 echo -e "************************************************************"
 echo -e "*         Creating VitalPBX Cluster role Command           *"
 echo -e "************************************************************"
-cat > /usr/local/bin/role << EOF
-#!/bin/bash
-# This code is the property of VitalPBX LLC Company
-# License: Proprietary
-# Date: 30-Sep-2022
-# Show the Role of Server.
-#Bash Colour Codes
-green="\033[00;32m"
-txtrst="\033[00;0m"
-linux_ver=`cat /etc/os-release | grep -e PRETTY_NAME | awk -F '=' '{print $2}' | xargs\`
-vitalpbx_ver=\`dpkg -l vitalpbx |awk '/vitalpbx/ {print \$3}'\`
-vpbx_version="${vitalpbx_ver}-${vitalpbx_release}"
-server_master=\`pcs status resources | awk 'NR==1 {print \$4}'\`
-host=\`hostname\`
-if [[ "\${server_master}" = "\${host}" ]]; then
-        server_mode="Master"
-else
-	server_mode="Standby"
-fi
-logo='
- _    _ _           _ ______ ______ _    _
-| |  | (_)_        | (_____ (____  \ \  / /
-| |  | |_| |_  ____| |_____) )___)  ) \/ /
- \ \/ /| |  _)/ _  | |  ____/  __  ( )  (
-  \  / | | |_( ( | | | |    | |__)  ) /\ \\
-   \/  |_|\___)_||_|_|_|    |______/_/  \_\\
-'
-echo -e "
-\${green}
-\${logo}
-\${txtrst}
- Role           : \$server_mode
- Version        : \${vpbx_version//[[:space:]]}
- Asterisk       : \`asterisk -rx "core show version" 2>/dev/null| grep -ohe 'Asterisk [0-9.]*'\`
- Linux Version  : \${linux_ver}
- Welcome to     : \`hostname\`
- Uptime         : \`uptime | grep -ohe 'up .*' | sed 's/up //g' | awk -F "," '{print \$1}'\`
- Load           : \`uptime | grep -ohe 'load average[s:][: ].*' | awk '{ print "Last Minute: " \$3" Last 5 Minutes: "\$4" Last 15 Minutes: "\$5 }'\`
- Users          : \`uptime | grep -ohe '[0-9.*] user[s,]'\`
- IP Address     : \${green}\`ip addr | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | xargs\`\${txtrst}
- Clock          :\`timedatectl | sed -n '/Local time/ s/^[ \t]*Local time:\(.*$\)/\1/p'\`
- NTP Sync.      :\`timedatectl |awk -F: '/NTP sync/ {print \$2}'\`
-"
-echo -e ""
-echo -e "************************************************************"
-echo -e "*                  Servers Status                          *"
-echo -e "************************************************************"
-echo -e "Master"
-pcs status resources
-echo -e ""
-echo -e "Servers Status"
-pcs cluster pcsd-status
-EOF
+wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/main/role /usr/local/bin/role
 chmod +x /usr/local/bin/role
 scp /usr/local/bin/role root@$ip_standby:/usr/local/bin/role
 ssh root@$ip_standby 'chmod +x /usr/local/bin/role'
