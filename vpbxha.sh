@@ -411,7 +411,6 @@ case $step in
 	18)
 		start="ceate_welcome_message"
 	;;
-	;;
 esac
 jumpto $start
 echo -e "*** Done Step 1 ***"
