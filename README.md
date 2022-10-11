@@ -22,7 +22,16 @@ e.- Root user is required for both servers to communicate.<br>
 f.- Both servers will not be able to have a proxy since this affects the communication between them.
 
 ## Configurations
-We will configure in each server the hosname and IP address. Edit the following file with nano, /etc/network/interfaces<br>
+We will configure in each server the hosname and IP address. 
+
+| Name          | Master                 | Standby               |
+| ------------- | ---------------------- | --------------------- |
+| Hostname      | vitalpbx1.local        | vitalpbx2.local       |
+| IP Address    | 192.168.10.61          | 192.168.10.62         |
+| Netmask       | 255.255.255.0          | 255.255.255.0         |
+| Gateway       | 192.168.10.1           | 192.168.10.1          |
+| Primary DNS   | 8.8.8.8                | 8.8.8.8               |
+| Secondary DNS | 8.8.4.4                | 8.8.4.4               |
 
 ### Server 1
 Change Hostname
@@ -72,15 +81,12 @@ netmask 255.255.255.0
 gateway 192.168.10.1
 </pre>
 
-
-| Name          | Master                 | Standby               |
-| ------------- | ---------------------- | --------------------- |
-| Hostname      | vitalpbx1.local        | vitalpbx2.local       |
-| IP Address    | 192.168.10.61          | 192.168.10.62         |
-| Netmask       | 255.255.255.0          | 255.255.255.0         |
-| Gateway       | 192.168.10.1           | 192.168.10.1          |
-| Primary DNS   | 8.8.8.8                | 8.8.8.8               |
-| Secondary DNS | 8.8.4.4                | 8.8.4.4               |
+Configure the hostname of each server in the /etc/hosts file, so that both servers see each other with the hostname.
+<pre>
+root@vitalpbx1-2:~# nano /etc/hosts
+192.168.10.61 vitalpbx1.local master1
+192.168.10.62 vitalpbx2.local master2
+</pre>
 
 ## Bind Address
 In the Master server go to SETTINGS/PJSIP Settings and configure the Floating IP that we are going to use in "Bind" and "TLS Bind".
