@@ -1276,7 +1276,7 @@ echo -e "************************************************************"
 echo -e "*         Creating VitalPBX Cluster bascul Command         *"
 echo -e "************************************************************"
 wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/main/bascul
-yes | cp -fr role /usr/local/bin/bascul
+yes | cp -fr bascul /usr/local/bin/bascul
 chmod +x /usr/local/bin/bascul
 scp /usr/local/bin/bascul root@$ip_standby:/usr/local/bin/bascul
 ssh root@$ip_standby 'chmod +x /usr/local/bin/bascul'
