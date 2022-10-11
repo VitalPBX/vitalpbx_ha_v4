@@ -52,12 +52,12 @@ fi
 
 while [[ $ip_master == '' ]]
 do
-    read -p "IP Master................ > " ip_master 
+    read -p "IP Server1............... > " ip_master 
 done 
 
 while [[ $ip_standby == '' ]]
 do
-    read -p "IP Standby............... > " ip_standby 
+    read -p "IP Server2............... > " ip_standby 
 done
 
 while [[ $ip_floating == '' ]]
