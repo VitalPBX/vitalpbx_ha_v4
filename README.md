@@ -228,27 +228,6 @@ If you have to turn off both servers at the same time, we recommend that you sta
 If the two servers stopped abruptly, always start first that you think you have the most up-to-date information and a few minutes later the other server<br>
 If you want to update the version of VitalPBX we recommend you do it first on Server 1, then do a bascul and do it again on Server 2<br>
 
-## Dahdi with Xorcom HA Hardware - Only install if you are using physical telephony cards
-If you are going to install Dhadi with Xorcom HA Hardware we recommend you to execute the following commands in the Server <strong>1</strong>
-
-<pre>
-[root@vitalpbx1 ~]# systemctl stop dahdi
-[root@vitalpbx1 ~]# systemctl disable dahdi
-[root@vitalpbx1 ~]# pcs resource create dahdi service:dahdi op monitor interval=30s
-[root@vitalpbx1 ~]# pcs cluster cib fs_cfg
-[root@vitalpbx1 ~]# pcs cluster cib-push fs_cfg --config
-[root@vitalpbx1 ~]# pcs -f fs_cfg constraint colocation add dahdi with virtual_ip INFINITY
-[root@vitalpbx1 ~]# pcs -f fs_cfg constraint order lsyncd then dahdi
-[root@vitalpbx1 ~]# pcs cluster cib-push fs_cfg --config
-</pre>
-
-and in the Server <strong>2</strong>
-
-<pre>
-[root@vitalpbx2 ~]# systemctl stop dahdi
-[root@vitalpbx2 ~]# systemctl disable dahdi
-</pre>
-
 ## Update VitalPBX version
 
 To update VitalPBX to the latest version just follow the following steps:<br>
