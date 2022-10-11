@@ -404,9 +404,13 @@ case $step in
 	;;
 	16)
 		start="vitalpbx_create_role"
-		;;
+	;;
 	17)
+		start="vitalpbx_create_mariadbfix"
+	;;
+	18)
 		start="ceate_welcome_message"
+	;;
 	;;
 esac
 jumpto $start
@@ -1295,6 +1299,17 @@ ssh root@$ip_standby 'chmod +x /usr/local/bin/role'
 echo -e "*** Done Step 17 ***"
 echo -e "17"	> step.txt
 
+vitalpbx_create_mariadbfix:
+echo -e "************************************************************"
+echo -e "*           Creating VitalPBX mariadbfix Command           *"
+echo -e "************************************************************"
+wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/master/mariadbfix
+yes | cp -fr mariadbfix /usr/local/bin/mariadbfix
+yes | cp -fr config.txt /usr/local/bin/config.txt
+chmod +x /usr/local/bin/mariadbfix
+echo -e "*** Done Step 18 ***"
+echo -e "18"	> step.txt
+
 ceate_welcome_message:
 echo -e "************************************************************"
 echo -e "*              Creating Welcome message                    *"
@@ -1304,13 +1319,8 @@ chmod 755 /etc/update-motd.d/20-vitalpbx
 echo -e "*** Done ***"
 scp /etc/update-motd.d/20-vitalpbx root@$ip_standby:/etc/update-motd.d/20-vitalpbx
 ssh root@$ip_standby "chmod 755 /etc/update-motd.d/20-vitalpbx"
-echo -e "*** Done Step 18 END ***"
-echo -e "18"	> step.txt
-
-wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/master/mariadbfix
-yes | cp -fr mariadbfix /usr/local/bin/mariadbfix
-yes | cp -fr config.txt /usr/local/bin/config.txt
-chmod +x /usr/local/bin/mariadbfix
+echo -e "*** Done Step 19 END ***"
+echo -e "19"	> step.txt
 
 vitalpbx_cluster_ok:
 echo -e "************************************************************"
