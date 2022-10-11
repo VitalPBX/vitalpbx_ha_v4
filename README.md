@@ -176,25 +176,25 @@ At the end of the installation you have to see the following message
 
 
  Role           : Master
- Version        : 4.0.0-1
- Asterisk       : 18.10.0
- Linux Version  : CentOS Linux release 7.8.2003 (Core)
+ Version        : 4.0.0-4
+ Asterisk       : Asterisk 18.14.0
+ Linux Version  : Debian GNU/Linux 11 (bullseye)
  Welcome to     : vitalpbx1.local
- Uptime         :  1:30
- Load           : Last Minute: 0.74, Last 5 Minutes: 0.30, Last 15 Minutes: 0.16
+ Uptime         : 50 min
+ Load           : Last Minute: 0.45, Last 5 Minutes: 0.40, Last 15 Minutes 0.19
  Users          : 4 users
  IP Address     : 192.168.10.61 192.168.10.60
- Clock          : Wed 2020-08-05 09:04:19 EDT
- NTP Sync.      : no
+ Clock          : Tue 2022-10-11 12:37:21 EDT
+ NTP Sync.      : active
 
 
 ************************************************************
 *                  Servers Status                          *
 ************************************************************
 Master
- virtual_ip     (ocf::heartbeat:IPaddr2):       Started vitalpbx1.local
- asterisk       (service:asterisk):     Started vitalpbx1.local
- lsyncd (service:lsyncd.service):       Started vitalpbx1.local
+  * virtual_ip  (ocf::heartbeat:IPaddr2):        Started vitalpbx1.local
+  * asterisk    (service:asterisk):      Started vitalpbx1.local
+  * lsyncd      (service:lsyncd.service):        Started vitalpbx1.local
 
 Servers Status
   vitalpbx1.local: Online
@@ -247,16 +247,9 @@ To update VitalPBX to the latest version just follow the following steps:<br>
 ## Some useful commands
 • <strong>bascul</strong>, is used to change roles between high availability servers. If all is well, a confirmation question should appear if we wish to execute the action.<br>
 • <strong>role</strong>, shows the status of the current server. If all is well you should return Masters or Slaves.<br>
+• <strong>mariadbfix</strong>, on some occasions the synchronization between the databases is lost, the causes can be many, with this command this synchronization is recovered easily and quickly.<br>
 • <strong>pcs resource refresh --full</strong>, to poll all resources even if the status is unknown, enter the following command.<br>
 • <strong>pcs cluster unstandby host</strong>, in some cases the bascul command does not finish tilting, which causes one of the servers to be in standby (stop), with this command the state is restored to normal.<br>
-
-## If the databases lose synchronization
-<pre>
-[root@vitalpbx1 /]# mysql -uroot
-mysql> STOP SLAVE;
-mysql> SET GLOBAL SQL_SLAVE_SKIP_COUNTER = 1;
-mysql> START SLAVE;
-</pre>
 
 ## More Information
 If you want more information that will help you solve problems about High Availability in VitalPBX we invite you to see the following manual<br>
