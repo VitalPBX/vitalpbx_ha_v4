@@ -287,7 +287,7 @@ collation-server      = utf8mb4_general_ci
 # use this group for options that older servers don't understand
 [mariadb-10.5]
 EOF
-scp /etc/my.cnf.d/server.cnf root@$ip_standby:/etc/my.cnf.d/server.cnf
+scp /etc/mysql/mariadb.conf.d/50-server.cnf root@$ip_standby:/etc/mysql/mariadb.conf.d/50-server.cnf
 mysql -uroot -e "STOP SLAVE;"
 mysql -uroot -e "RESET SLAVE;"
 systemctl restart mariadb
