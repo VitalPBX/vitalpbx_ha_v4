@@ -1,7 +1,7 @@
 #!/bin/bash
 # This code is the property of VitalPBX LLC Company
 # License: Proprietary
-# Date: 8-Oct-2022
+# Date: 10-Oct-2022
 # VitalPBX Hight Availability with MariaDB Replica, Corosync, PCS, Pacemaker and Lsync
 #
 set -e
@@ -43,8 +43,8 @@ if [ -f $filename ]; then
 		esac
 		n=$((n+1))
 	done < $filename
-	echo -e "IP Master................ > $ip_master"	
-	echo -e "IP Standby............... > $ip_standby"
+	echo -e "IP Server1............... > $ip_master"	
+	echo -e "IP Server2............... > $ip_standby"
 	echo -e "Floating IP.............. > $ip_floating "
 	echo -e "Floating IP Mask (SIDR).. > $ip_floating_mask"
 	echo -e "hacluster password....... > $hapassword"
@@ -295,14 +295,14 @@ ssh root@$ip_standby 'mysql -uroot -e "STOP SLAVE;"'
 ssh root@$ip_standby 'mysql -uroot -e "RESET SLAVE;"'
 ssh root@$ip_standby "systemctl restart mariadb"
 
-cat > /etc/lsyncd.conf << EOF
+cat > /etc/lsyncd/lsyncd.conf.lua << EOF
 ----
 -- User configuration file for lsyncd.
 --
 -- Simple example for default rsync.
 --
 EOF
-scp /etc/lsyncd.conf root@$ip_standby:/etc/lsyncd.conf
+scp /etc/lsyncd/lsyncd.conf.lua root@$ip_standby:/etc/lsyncd/lsyncd.conf.lua
 cat > /tmp/remotecluster.sh << EOF
 #!/bin/bash
 pcs cluster destroy
@@ -337,7 +337,7 @@ echo -e "************************************************************"
 echo -e "*            Cluster destroyed successfully                *"
 echo -e "************************************************************"
 		
-	fi
+fi
 	echo -e "2"	> step.txt
 	exit
 fi
@@ -1190,6 +1190,7 @@ auth_hacluster:
 echo -e "************************************************************"
 echo -e "*            Server Authenticate in Master                 *"
 echo -e "************************************************************"
+pcs cluster destroy
 pcs host auth $host_master $host_standby -u hacluster -p $hapassword
 echo -e "*** Done Step 9 ***"
 echo -e "9"	> step.txt
