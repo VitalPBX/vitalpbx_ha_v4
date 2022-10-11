@@ -25,9 +25,13 @@ f.- Both servers will not be able to have a proxy since this affects the communi
 We will configure in each server the hosname and IP address. Edit the following file with nano, /etc/network/interfaces<br>
 
 ### Server 1
+Change Hostname
 <pre>
 root@vitalpbx1:~# hostname vitalpbx1.local
+</pre>
 
+Change Ip Address, edit the following file with nano, /etc/network/interfaces
+<pre>
 root@vitalpbx1:~# nano /etc/network/interfaces
 
 Change
@@ -45,9 +49,13 @@ gateway 192.168.10.1
 </pre>
 
 ### Server 2
+Change Hostname
 <pre>
 root@vitalpbx2:~# hostname vitalpbx2.local
+</pre>
 
+Change Ip Address, edit the following file with nano, /etc/network/interfaces
+<pre>
 root@vitalpbx2:~# nano /etc/network/interfaces
 
 Change
