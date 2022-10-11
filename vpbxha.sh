@@ -1012,7 +1012,7 @@ cat > /tmp/50-server.cnf << EOF
 # * Replica Settings
 #
 
-bind-address	= $ip_slave
+bind-address	= $ip_standby
 server-id	= 2
 report_host	= master2
 log_bin		= /var/log/mysql/mariadb-bin
