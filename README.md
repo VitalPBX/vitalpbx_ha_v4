@@ -144,8 +144,8 @@ root@vitalpbx<strong>1</strong>:~# ./vpbxha.sh
 *  Welcome to the VitalPBX high availability installation  *
 *                All options are mandatory                 *
 ************************************************************
-IP Master................ > <strong>192.168.10.61</strong>
-IP Standby............... > <strong>192.168.10.62</strong>
+IP Server1............... > <strong>192.168.10.61</strong>
+IP Server2............... > <strong>192.168.10.62</strong>
 Floating IP.............. > <strong>192.168.10.60</strong>
 Floating IP Mask (SIDR).. > <strong>24</strong>
 hacluster password....... > <strong>MyPassword (any password)</strong>
