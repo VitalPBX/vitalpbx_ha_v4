@@ -864,7 +864,7 @@ cat > /etc/mysql/mariadb.conf.d/50-server.cnf << EOF
 # * Replica Settings
 #
 
-bind-address	= $ip_master
+bind-address	= 127.0.0.1
 server-id	= 1
 report_host	= master1
 log_bin		= /var/log/mysql/mariadb-bin
@@ -1015,7 +1015,7 @@ cat > /tmp/50-server.cnf << EOF
 # * Replica Settings
 #
 
-bind-address	= $ip_standby
+bind-address	= 127.0.0.1
 server-id	= 2
 report_host	= master2
 log_bin		= /var/log/mysql/mariadb-bin
