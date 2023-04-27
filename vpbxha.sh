@@ -134,7 +134,7 @@ echo -e "*****************************************************************"
 		systemctl stop pacemaker.service
 
 wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/main/welcome
-yes | cp -fr welcome /usr/local/bin/role /etc/update-motd.d/20-vitalpbx
+yes | cp -fr welcome /etc/update-motd.d/20-vitalpbx
 chmod 755 /etc/update-motd.d/20-vitalpbx
 scp /etc/update-motd.d/20-vitalpbx root@$ip_standby:/etc/update-motd.d/20-vitalpbx
 ssh root@$ip_standby "chmod 755 /etc/update-motd.d/20-vitalpbx"
