@@ -7,6 +7,7 @@ Make a high-availability cluster out of any pair of VitalPBX servers. VitalPBX c
 ### :warning:<strong>Important notes:</strong></span><br>
 - If you are going to restore some Backup from another server that is not in HA, restore it first in the Master server before creating the HA. This should be done as the backup does not contain the firewall rules for HA to work.<br>
 - The VitalPBX team does not provide support for systems in an HA environment because it is not possible to determine the environment where it has been installed.
+- We recommend that Server 2 is completely clean if nothing is installed, otherwise the Script could give errors and the process would not be completed.
 
 ## Example:<br>
 ![VitalPBX HA](https://github.com/VitalPBX/vitalpbx_ha_v4/blob/main/HAReplica2Servers.png)
