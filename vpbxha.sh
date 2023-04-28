@@ -433,6 +433,7 @@ echo -e "*                Remove Tenant in Server 2                 *"
 echo -e "************************************************************"
 remote_tenant_id=`ssh root@$ip_standby "ls /var/lib/vitalpbx/static/"`
 ssh root@$ip_standby "rm -rf /var/lib/vitalpbx/static/$remote_tenant_id"
+scp /etc/vitalpbx/vitalpbx-maint.conf root@$ip_standby:/etc/vitalpbx/vitalpbx-maint.conf
 echo -e "*** Done Step 3 ***"
 echo -e "3"	> step.txt
 
