@@ -1,7 +1,7 @@
 #!/bin/bash
 # This code is the property of VitalPBX LLC Company
 # License: Proprietary
-# Date: 10-Oct-2022
+# Date: 28-Apr-2023
 # VitalPBX Hight Availability with MariaDB Replica, Corosync, PCS, Pacemaker and Lsync
 #
 set -e
