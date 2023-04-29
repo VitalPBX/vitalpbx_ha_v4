@@ -7,6 +7,22 @@
 echo -e "************************************************************"
 echo -e "*                Create mariadb replica                    *"
 echo -e "************************************************************"
+filename="config.txt"
+if [ -f $filename ]; then
+        echo -e "config file"
+        n=1
+        while read line; do
+                case $n in
+                        1)
+                                ip_master=$line
+                        ;;
+                        2)
+                                ip_standby=$line
+                        ;;
+                esac
+                n=$((n+1))
+        done < $filename
+fi
 mysql -uroot -e "STOP SLAVE;"
 mysql -uroot -e "RESET SLAVE;"
 systemctl restart mariadb
@@ -61,8 +77,6 @@ ssh root@$ip_standby "/tmp/./change.sh"
 mysql -uroot -e "STOP SLAVE;"
 mysql -uroot -e "CHANGE MASTER TO MASTER_HOST='$ip_standby', MASTER_USER='vitalpbx_replica', MASTER_PASSWORD='vitalpbx_replica', MASTER_LOG_FILE='$file_server_2', MASTER_LOG_POS=$position_server_2;"
 mysql -uroot -e "START SLAVE;"
-EOF
-chmod +x /usr/local/bin/mariadbfix
 
 echo -e "************************************************************"
 echo -e "*                 VitalPBX Cluster OK                      *"
