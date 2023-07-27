@@ -169,7 +169,7 @@ mysql -uroot ombutel -e "DELETE FROM ombu_firewall_services WHERE name = 'HA5404
 mysql -uroot ombutel -e "DELETE FROM ombu_firewall_services WHERE name = 'HA21064'"
 mysql -uroot ombutel -e "DELETE FROM ombu_firewall_services WHERE name = 'HA9929'"
 
-
+cat > /etc/lsyncd/lsyncd.conf.lua << EOF
 ----
 -- User configuration file for lsyncd.
 --
@@ -244,45 +244,42 @@ case $step in
 		start="create_lsyncd_config_file"
   	;;
 	5)
-		start="create_mariadb_replica"
-	;;
-	6)
 		start="create_hacluster_password"
   	;;
 	7)
 		start="starting_pcs"
   	;;
-	8)
+	7)
 		start="auth_hacluster"
   	;;
-	9)
+	8)
 		start="creating_cluster"
   	;;
-	10)
+	9)
 		start="starting_cluster"
   	;;
-	11)
+	10)
 		start="creating_floating_ip"
   	;;
-	12)
+	11)
 		start="disable_services"
 	;;
-	13)
+	12)
 		start="create_asterisk_service"
 	;;
-	14)
+	13)
 		start="create_lsyncd_service"
 	;;
-	15)
+	14)
 		start="vitalpbx_create_bascul"
 	;;
-	16)
+	15)
 		start="vitalpbx_create_role"
 	;;
-	17)
+	16)
 		start="vitalpbx_create_mariadbfix"
 	;;
-	18)
+	17)
 		start="ceate_welcome_message"
 	;;
 esac
@@ -438,6 +435,26 @@ settings {
 }
 sync {
 		default.rsyncssh,
+		source = "/var/lib/mysql/asterisk",
+		host = "$ip_standby",
+		targetdir = "/var/lib/mysql/asterisk",
+		rsync = {
+				owner = true,
+				group = true
+		}
+}
+sync {
+		default.rsyncssh,
+		source = "/var/lib/mysql/ombutel",
+		host = "$ip_standby",
+		targetdir = "/var/lib/mysql/ombutel",
+		rsync = {
+				owner = true,
+				group = true
+		}
+}
+sync {
+		default.rsyncssh,
 		source = "/var/spool/asterisk/monitor",
 		host = "$ip_standby",
 		targetdir = "/var/spool/asterisk/monitor",
@@ -583,6 +600,26 @@ settings {
 }
 sync {
 		default.rsyncssh,
+		source = "/var/lib/mysql/asterisk",
+		host = "$ip_master",
+		targetdir = "/var/lib/mysql/asterisk",
+		rsync = {
+				owner = true,
+				group = true
+		}
+}
+sync {
+		default.rsyncssh,
+		source = "/var/lib/mysql/ombutel",
+		host = "$ip_master",
+		targetdir = "/var/lib/mysql/ombutel",
+		rsync = {
+				owner = true,
+				group = true
+		}
+}
+sync {
+		default.rsyncssh,
 		source = "/var/spool/asterisk/monitor",
 		host = "$ip_master",
 		targetdir = "/var/spool/asterisk/monitor",
@@ -712,334 +749,6 @@ scp /tmp/lsyncd.conf.lua root@$ip_standby:/etc/lsyncd/lsyncd.conf.lua
 echo -e "*** Done Step 5 ***"
 echo -e "5"	> step.txt
 
-create_mariadb_replica:
-echo -e "************************************************************"
-echo -e "*                Create mariadb replica                    *"
-echo -e "************************************************************"
-#Enable chrony service
-systemctl start chrony
-systemctl enable chrony
-ssh root@$ip_standby "systemctl start chrony"
-ssh root@$ip_standby "systemctl enable chrony"
-#Remove anonymous user from MySQL
-mysql -uroot -e "DELETE FROM mysql.user WHERE User='';"
-#Configuration of the First Master Server (Master-1)
-cat > /etc/mysql/mariadb.conf.d/50-server.cnf << EOF
-#
-# These groups are read by MariaDB server.
-# Use it for options that only the server (but not clients) should see
-
-# this is read by the standalone daemon and embedded servers
-[server]
-
-# this is only for the mysqld standalone daemon
-[mysqld]
-
-#
-# * Replica Settings
-#
-
-bind-address	= 0.0.0.0
-server-id	= 1
-report_host	= master1
-log_bin		= /var/log/mysql/mariadb-bin
-log_bin_index	= /var/log/mysql/mariadb-bin.index
-relay_log	= /var/log/mysql/relay-bin
-relay_log_index	= /var/log/mysql/relay-bin.index
-
-#
-# * Basic Settings
-#
-
-user                    = mysql
-pid-file                = /run/mysqld/mysqld.pid
-basedir                 = /usr
-datadir                 = /var/lib/mysql
-tmpdir                  = /tmp
-lc-messages-dir         = /usr/share/mysql
-lc-messages             = en_US
-skip-external-locking
-
-# Broken reverse DNS slows down connections considerably and name resolve is
-# safe to skip if there are no "host by domain name" access grants
-#skip-name-resolve
-
-# Instead of skip-networking the default is now to listen only on
-# localhost which is more compatible and is not less secure.
-#bind-address            = 127.0.0.1
-
-#
-# * Fine Tuning
-#
-
-#key_buffer_size        = 128M
-#max_allowed_packet     = 1G
-#thread_stack           = 192K
-#thread_cache_size      = 8
-# This replaces the startup script and checks MyISAM tables if needed
-# the first time they are touched
-#myisam_recover_options = BACKUP
-#max_connections        = 100
-#table_cache            = 64
-
-#
-# * Logging and Replication
-#
-
-# Both location gets rotated by the cronjob.
-# Be aware that this log type is a performance killer.
-# Recommend only changing this at runtime for short testing periods if needed!
-#general_log_file       = /var/log/mysql/mysql.log
-#general_log            = 1
-
-# When running under systemd, error logging goes via stdout/stderr to journald
-# and when running legacy init error logging goes to syslog due to
-# /etc/mysql/conf.d/mariadb.conf.d/50-mysqld_safe.cnf
-# Enable this if you want to have error logging into a separate file
-#log_error = /var/log/mysql/error.log
-# Enable the slow query log to see queries with especially long duration
-#slow_query_log_file    = /var/log/mysql/mariadb-slow.log
-#long_query_time        = 10
-#log_slow_verbosity     = query_plan,explain
-#log-queries-not-using-indexes
-#min_examined_row_limit = 1000
-
-# The following can be used as easy to replay backup logs or for replication.
-# note: if you are setting up a replication slave, see README.Debian about
-#       other settings you may need to change.
-#server-id              = 1
-#log_bin                = /var/log/mysql/mysql-bin.log
-expire_logs_days        = 10
-#max_binlog_size        = 100M
-
-#
-# * SSL/TLS
-#
-
-# For documentation, please read
-# https://mariadb.com/kb/en/securing-connections-for-client-and-server/
-#ssl-ca = /etc/mysql/cacert.pem
-#ssl-cert = /etc/mysql/server-cert.pem
-#ssl-key = /etc/mysql/server-key.pem
-#require-secure-transport = on
-
-#
-# * Character sets
-#
-
-# MySQL/MariaDB default is Latin1, but in Debian we rather default to the full
-# utf8 4-byte character set. See also client.cnf
-character-set-server  = utf8mb4
-collation-server      = utf8mb4_general_ci
-
-#
-# * InnoDB
-#
-
-# InnoDB is enabled by default with a 10MB datafile in /var/lib/mysql/.
-# Read the manual for more InnoDB related options. There are many!
-# Most important is to give InnoDB 80 % of the system RAM for buffer use:
-# https://mariadb.com/kb/en/innodb-system-variables/#innodb_buffer_pool_size
-#innodb_buffer_pool_size = 8G
-
-# this is only for embedded server
-[embedded]
-
-# This group is only read by MariaDB servers, not by MySQL.
-# If you use the same .cnf file for MySQL and MariaDB,
-# you can put MariaDB-only options here
-[mariadb]
-
-# This group is only read by MariaDB-10.5 servers.
-# If you use the same .cnf file for MariaDB of different versions,
-# use this group for options that older servers don't understand
-[mariadb-10.5]
-EOF
-systemctl restart mariadb
-#Create a new user on the Master-1
-mysql -uroot -e "GRANT REPLICATION SLAVE ON *.* to vitalpbx_replica@'%' IDENTIFIED BY 'vitalpbx_replica';"
-mysql -uroot -e "FLUSH PRIVILEGES;"
-mysql -uroot -e "FLUSH TABLES WITH READ LOCK;"
-#Get bin_log on Master-1
-file_server_1=`mysql -uroot -e "show master status" | awk 'NR==2 {print $1}'`
-position_server_1=`mysql -uroot -e "show master status" | awk 'NR==2 {print $2}'`
-
-#Now on the Master-1 server, do a dump of the database MySQL and import it to Master-2
-mysqldump -u root --all-databases > all_databases.sql
-scp all_databases.sql root@$ip_standby:/tmp/all_databases.sql
-cat > /tmp/mysqldump.sh << EOF
-#!/bin/bash
-mysql mysql -u root <  /tmp/all_databases.sql 
-EOF
-scp /tmp/mysqldump.sh root@$ip_standby:/tmp/mysqldump.sh
-ssh root@$ip_standby "chmod +x /tmp/mysqldump.sh"
-ssh root@$ip_standby "/tmp/./mysqldump.sh"
-
-#Configuration of the Second Master Server (Master-2)
-cat > /tmp/50-server.cnf << EOF
-#
-# These groups are read by MariaDB server.
-# Use it for options that only the server (but not clients) should see
-
-# this is read by the standalone daemon and embedded servers
-[server]
-# this is only for the mysqld standalone daemon
-[mysqld]
-
-#
-# * Replica Settings
-#
-
-bind-address	= 0.0.0.0
-server-id	= 2
-report_host	= master2
-log_bin		= /var/log/mysql/mariadb-bin
-log_bin_index	= /var/log/mysql/mariadb-bin.index
-relay_log	= /var/log/mysql/relay-bin
-relay_log_index	= /var/log/mysql/relay-bin.index
-
-#
-# * Basic Settings
-#
-
-user                    = mysql
-pid-file                = /run/mysqld/mysqld.pid
-basedir                 = /usr
-datadir                 = /var/lib/mysql
-tmpdir                  = /tmp
-lc-messages-dir         = /usr/share/mysql
-lc-messages             = en_US
-skip-external-locking
-
-# Broken reverse DNS slows down connections considerably and name resolve is
-# safe to skip if there are no "host by domain name" access grants
-#skip-name-resolve
-
-# Instead of skip-networking the default is now to listen only on
-# localhost which is more compatible and is not less secure.
-#bind-address            = 127.0.0.1
-
-#
-# * Fine Tuning
-#
-
-#key_buffer_size        = 128M
-#max_allowed_packet     = 1G
-#thread_stack           = 192K
-#thread_cache_size      = 8
-# This replaces the startup script and checks MyISAM tables if needed
-# the first time they are touched
-#myisam_recover_options = BACKUP
-#max_connections        = 100
-#table_cache            = 64
-
-#
-# * Logging and Replication
-#
-
-# Both location gets rotated by the cronjob.
-# Be aware that this log type is a performance killer.
-# Recommend only changing this at runtime for short testing periods if needed!
-#general_log_file       = /var/log/mysql/mysql.log
-#general_log            = 1
-
-# When running under systemd, error logging goes via stdout/stderr to journald
-# and when running legacy init error logging goes to syslog due to
-# /etc/mysql/conf.d/mariadb.conf.d/50-mysqld_safe.cnf
-# Enable this if you want to have error logging into a separate file
-#log_error = /var/log/mysql/error.log
-# Enable the slow query log to see queries with especially long duration
-#slow_query_log_file    = /var/log/mysql/mariadb-slow.log
-#long_query_time        = 10
-#log_slow_verbosity     = query_plan,explain
-#log-queries-not-using-indexes
-#min_examined_row_limit = 1000
-
-# The following can be used as easy to replay backup logs or for replication.
-# note: if you are setting up a replication slave, see README.Debian about
-#       other settings you may need to change.
-#server-id              = 1
-#log_bin                = /var/log/mysql/mysql-bin.log
-expire_logs_days        = 10
-#max_binlog_size        = 100M
-
-#
-# * SSL/TLS
-#
-
-# For documentation, please read
-# https://mariadb.com/kb/en/securing-connections-for-client-and-server/
-#ssl-ca = /etc/mysql/cacert.pem
-#ssl-cert = /etc/mysql/server-cert.pem
-#ssl-key = /etc/mysql/server-key.pem
-#require-secure-transport = on
-
-#
-# * Character sets
-#
-
-# MySQL/MariaDB default is Latin1, but in Debian we rather default to the full
-# utf8 4-byte character set. See also client.cnf
-character-set-server  = utf8mb4
-collation-server      = utf8mb4_general_ci
-
-#
-# * InnoDB
-#
-
-# InnoDB is enabled by default with a 10MB datafile in /var/lib/mysql/.
-# Read the manual for more InnoDB related options. There are many!
-# Most important is to give InnoDB 80 % of the system RAM for buffer use:
-# https://mariadb.com/kb/en/innodb-system-variables/#innodb_buffer_pool_size
-#innodb_buffer_pool_size = 8G
-
-# this is only for embedded server
-[embedded]
-
-# This group is only read by MariaDB servers, not by MySQL.
-# If you use the same .cnf file for MySQL and MariaDB,
-# you can put MariaDB-only options here
-[mariadb]
-
-# This group is only read by MariaDB-10.5 servers.
-# If you use the same .cnf file for MariaDB of different versions,
-# use this group for options that older servers don't understand
-[mariadb-10.5]
-EOF
-scp /tmp/50-server.cnf root@$ip_standby:/etc/mysql/mariadb.conf.d/50-server.cnf
-ssh root@$ip_standby "systemctl restart mariadb"
-#Create a new user on the Master-2
-cat > /tmp/grand.sh << EOF
-#!/bin/bash
-mysql -uroot -e "GRANT REPLICATION SLAVE ON *.* to vitalpbx_replica@'%' IDENTIFIED BY 'vitalpbx_replica';"
-mysql -uroot -e "FLUSH PRIVILEGES;"
-mysql -uroot -e "FLUSH TABLES WITH READ LOCK;"
-EOF
-scp /tmp/grand.sh root@$ip_standby:/tmp/grand.sh
-ssh root@$ip_standby "chmod +x /tmp/grand.sh"
-ssh root@$ip_standby "/tmp/./grand.sh"
-#Get bin_log on Master-2
-file_server_2=`ssh root@$ip_standby 'mysql -uroot -e "show master status;"' | awk 'NR==2 {print $1}'`
-position_server_2=`ssh root@$ip_standby 'mysql -uroot -e "show master status;"' | awk 'NR==2 {print $2}'`
-#Stop the slave, add Master-1 to the Master-2 and start slave
-cat > /tmp/change.sh << EOF
-#!/bin/bash
-mysql -uroot -e "STOP SLAVE;"
-mysql -uroot -e "CHANGE MASTER TO MASTER_HOST='$ip_master', MASTER_USER='vitalpbx_replica', MASTER_PASSWORD='vitalpbx_replica', MASTER_LOG_FILE='$file_server_1', MASTER_LOG_POS=$position_server_1;"
-mysql -uroot -e "START SLAVE;"
-EOF
-scp /tmp/change.sh root@$ip_standby:/tmp/change.sh
-ssh root@$ip_standby "chmod +x /tmp/change.sh"
-ssh root@$ip_standby "/tmp/./change.sh"
-
-#Connect to Master-1 and follow the same steps
-mysql -uroot -e "STOP SLAVE;"
-mysql -uroot -e "CHANGE MASTER TO MASTER_HOST='$ip_standby', MASTER_USER='vitalpbx_replica', MASTER_PASSWORD='vitalpbx_replica', MASTER_LOG_FILE='$file_server_2', MASTER_LOG_POS=$position_server_2;"
-mysql -uroot -e "START SLAVE;"
-
-echo -e "*** Done Step 6 ***"
-echo -e "6"	> step.txt
-
 create_hacluster_password:
 echo -e "************************************************************"
 echo -e "*     Create password for hacluster in Master/Standby      *"
@@ -1047,7 +756,7 @@ echo -e "************************************************************"
 echo hacluster:$hapassword | chpasswd
 ssh root@$ip_standby "echo hacluster:$hapassword | chpasswd"
 echo -e "*** Done Step 7 ***"
-echo -e "7"	> step.txt
+echo -e "6"	> step.txt
 
 starting_pcs:
 echo -e "************************************************************"
@@ -1062,7 +771,7 @@ ssh root@$ip_standby "systemctl enable pcsd.service"
 ssh root@$ip_standby "systemctl enable corosync.service"
 ssh root@$ip_standby "systemctl enable pacemaker.service"
 echo -e "*** Done Step 8 ***"
-echo -e "8"	> step.txt
+echo -e "7"	> step.txt
 
 auth_hacluster:
 echo -e "************************************************************"
@@ -1071,7 +780,7 @@ echo -e "************************************************************"
 pcs cluster destroy
 pcs host auth $host_master $host_standby -u hacluster -p $hapassword
 echo -e "*** Done Step 9 ***"
-echo -e "9"	> step.txt
+echo -e "8"	> step.txt
 
 creating_cluster:
 echo -e "************************************************************"
@@ -1079,7 +788,7 @@ echo -e "*              Creating Cluster in Master                  *"
 echo -e "************************************************************"
 pcs cluster setup cluster_vitalpbx $host_master $host_standby --force
 echo -e "*** Done Step 10 ***"
-echo -e "10"	> step.txt
+echo -e "9"	> step.txt
 
 starting_cluster:
 echo -e "************************************************************"
@@ -1090,7 +799,7 @@ pcs cluster enable --all
 pcs property set stonith-enabled=false
 pcs property set no-quorum-policy=ignore
 echo -e "*** Done Step 11 ***"
-echo -e "11"	> step.txt
+echo -e "10"	> step.txt
 
 creating_floating_ip:
 echo -e "************************************************************"
@@ -1100,7 +809,7 @@ pcs resource create virtual_ip ocf:heartbeat:IPaddr2 ip=$ip_floating cidr_netmas
 pcs cluster cib drbd_cfg
 pcs cluster cib-push drbd_cfg
 echo -e "*** Done Step 12 ***"
-echo -e "12"	> step.txt
+echo -e "11"	> step.txt
 
 disable_services:
 echo -e "************************************************************"
@@ -1115,7 +824,7 @@ ssh root@$ip_standby "systemctl stop asterisk"
 ssh root@$ip_standby "systemctl disable lsyncd"
 ssh root@$ip_standby "systemctl stop lsyncd"
 echo -e "*** Done Step 13 ***"
-echo -e "13"	> step.txt
+echo -e "12"	> step.txt
 
 create_asterisk_service:
 echo -e "************************************************************"
@@ -1134,7 +843,7 @@ pcs resource update asterisk op stop timeout=120s
 pcs resource update asterisk op start timeout=120s
 pcs resource update asterisk op restart timeout=120s
 echo -e "*** Done Step 14 ***"
-echo -e "14"	> step.txt
+echo -e "13"	> step.txt
 
 create_lsyncd_service:
 echo -e "************************************************************"
@@ -1147,7 +856,7 @@ pcs -f fs_cfg constraint colocation add lsyncd with virtual_ip INFINITY
 pcs -f fs_cfg constraint order asterisk then lsyncd
 pcs cluster cib-push fs_cfg --config
 echo -e "*** Done Step 15 ***"
-echo -e "15"	> step.txt
+echo -e "14"	> step.txt
 
 vitalpbx_create_bascul:
 echo -e "************************************************************"
@@ -1159,7 +868,7 @@ chmod +x /usr/local/bin/bascul
 scp /usr/local/bin/bascul root@$ip_standby:/usr/local/bin/bascul
 ssh root@$ip_standby 'chmod +x /usr/local/bin/bascul'
 echo -e "*** Done Step 16 ***"
-echo -e "16"	> step.txt
+echo -e "15"	> step.txt
 
 vitalpbx_create_role:
 echo -e "************************************************************"
@@ -1171,7 +880,7 @@ chmod +x /usr/local/bin/role
 scp /usr/local/bin/role root@$ip_standby:/usr/local/bin/role
 ssh root@$ip_standby 'chmod +x /usr/local/bin/role'
 echo -e "*** Done Step 17 ***"
-echo -e "17"	> step.txt
+echo -e "16"	> step.txt
 
 vitalpbx_create_mariadbfix:
 echo -e "************************************************************"
@@ -1182,7 +891,7 @@ yes | cp -fr mariadbfix /usr/local/bin/mariadbfix
 yes | cp -fr config.txt /usr/local/bin/config.txt
 chmod +x /usr/local/bin/mariadbfix
 echo -e "*** Done Step 18 ***"
-echo -e "18"	> step.txt
+echo -e "17"	> step.txt
 
 ceate_welcome_message:
 echo -e "************************************************************"
@@ -1194,7 +903,7 @@ echo -e "*** Done ***"
 scp /etc/update-motd.d/20-vitalpbx root@$ip_standby:/etc/update-motd.d/20-vitalpbx
 ssh root@$ip_standby "chmod 755 /etc/update-motd.d/20-vitalpbx"
 echo -e "*** Done Step 19 END ***"
-echo -e "19"	> step.txt
+echo -e "18"	> step.txt
 
 vitalpbx_cluster_ok:
 echo -e "************************************************************"
