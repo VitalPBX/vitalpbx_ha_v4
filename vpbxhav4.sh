@@ -268,18 +268,21 @@ case $step in
 		start="create_asterisk_service"
 	;;
 	13)
-		start="create_lsyncd_service"
+		start="create_mariadb_service"
 	;;
 	14)
-		start="vitalpbx_create_bascul"
+		start="create_lsyncd_service"
 	;;
 	15)
-		start="vitalpbx_create_role"
+		start="vitalpbx_create_bascul"
 	;;
 	16)
-		start="vitalpbx_create_mariadbfix"
+		start="vitalpbx_create_role"
 	;;
 	17)
+		start="vitalpbx_create_mariadbfix"
+	;;
+	18)
 		start="ceate_welcome_message"
 	;;
 esac
@@ -817,10 +820,14 @@ echo -e "*             Disable Services in Server 1 and 2           *"
 echo -e "************************************************************"
 systemctl disable asterisk
 systemctl stop asterisk
+systemctl disable mariadb
+systemctl stop mariadb
 systemctl disable lsyncd
 systemctl stop lsyncd
 ssh root@$ip_standby "systemctl disable asterisk"
 ssh root@$ip_standby "systemctl stop asterisk"
+ssh root@$ip_standby "systemctl disable mariadb"
+ssh root@$ip_standby "systemctl stop mariadb"
 ssh root@$ip_standby "systemctl disable lsyncd"
 ssh root@$ip_standby "systemctl stop lsyncd"
 echo -e "*** Done Step 13 ***"
@@ -842,8 +849,21 @@ pcs cluster cib-push fs_cfg --config
 pcs resource update asterisk op stop timeout=120s
 pcs resource update asterisk op start timeout=120s
 pcs resource update asterisk op restart timeout=120s
-echo -e "*** Done Step 14 ***"
+echo -e "*** Done Step 13 ***"
 echo -e "13"	> step.txt
+
+create_mariadb_service:
+echo -e "************************************************************"
+echo -e "*             Create mariadb Service in Server 1           *"
+echo -e "************************************************************"
+pcs resource create mariadb service:mariadb.service op monitor interval=30s
+pcs cluster cib fs_cfg
+pcs cluster cib-push fs_cfg --config
+pcs -f fs_cfg constraint colocation add mariadb with virtual_ip INFINITY
+pcs -f fs_cfg constraint order asterisk then mariadb
+pcs cluster cib-push fs_cfg --config
+echo -e "*** Done Step 14 ***"
+echo -e "14"	> step.txt
 
 create_lsyncd_service:
 echo -e "************************************************************"
@@ -853,10 +873,10 @@ pcs resource create lsyncd service:lsyncd.service op monitor interval=30s
 pcs cluster cib fs_cfg
 pcs cluster cib-push fs_cfg --config
 pcs -f fs_cfg constraint colocation add lsyncd with virtual_ip INFINITY
-pcs -f fs_cfg constraint order asterisk then lsyncd
+pcs -f fs_cfg constraint order mariadb then lsyncd
 pcs cluster cib-push fs_cfg --config
 echo -e "*** Done Step 15 ***"
-echo -e "14"	> step.txt
+echo -e "15"	> step.txt
 
 vitalpbx_create_bascul:
 echo -e "************************************************************"
@@ -868,7 +888,7 @@ chmod +x /usr/local/bin/bascul
 scp /usr/local/bin/bascul root@$ip_standby:/usr/local/bin/bascul
 ssh root@$ip_standby 'chmod +x /usr/local/bin/bascul'
 echo -e "*** Done Step 16 ***"
-echo -e "15"	> step.txt
+echo -e "16"	> step.txt
 
 vitalpbx_create_role:
 echo -e "************************************************************"
@@ -880,7 +900,7 @@ chmod +x /usr/local/bin/role
 scp /usr/local/bin/role root@$ip_standby:/usr/local/bin/role
 ssh root@$ip_standby 'chmod +x /usr/local/bin/role'
 echo -e "*** Done Step 17 ***"
-echo -e "16"	> step.txt
+echo -e "17"	> step.txt
 
 vitalpbx_create_mariadbfix:
 echo -e "************************************************************"
@@ -891,7 +911,7 @@ yes | cp -fr mariadbfix /usr/local/bin/mariadbfix
 yes | cp -fr config.txt /usr/local/bin/config.txt
 chmod +x /usr/local/bin/mariadbfix
 echo -e "*** Done Step 18 ***"
-echo -e "17"	> step.txt
+echo -e "18"	> step.txt
 
 ceate_welcome_message:
 echo -e "************************************************************"
@@ -903,7 +923,7 @@ echo -e "*** Done ***"
 scp /etc/update-motd.d/20-vitalpbx root@$ip_standby:/etc/update-motd.d/20-vitalpbx
 ssh root@$ip_standby "chmod 755 /etc/update-motd.d/20-vitalpbx"
 echo -e "*** Done Step 19 END ***"
-echo -e "18"	> step.txt
+echo -e "19"	> step.txt
 
 vitalpbx_cluster_ok:
 echo -e "************************************************************"
