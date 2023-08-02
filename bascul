@@ -58,7 +58,7 @@ if [[ "${perform_bascul}" = "yes" ]]; then
         #Do a loop per resource
         pcs status resources | awk '{print $2}' | while read -r resource ; do
                 #Skip moving the virutal_ip resource, it will be moved at the end
-                if [[ "${resource}" != "virtual_ip" ]]; then
+                if [[ "${resource}" != "virtual_ip" ]] && [[ "${resource}" != "Clone" ]] && [[ "${resource}" != "Masters:" ]] && [[ "${resource}" != "Slaves:" ]]; then
                         echo "Moving ${resource} from ${host_master} to ${host_standby}"
                         pcs resource move ${resource} ${host_standby}
                 fi
