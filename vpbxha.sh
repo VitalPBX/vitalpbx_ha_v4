@@ -1304,9 +1304,8 @@ echo -e "************************************************************"
 echo -e "*           Creating VitalPBX mariadbfix Command           *"
 echo -e "************************************************************"
 wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/master/mariadbfix.sh
-chmod +x /usr/local/bin/mariadbfix.sh
+chmod +x mariadbfix.sh
 echo -e "*** Done Step 18 ***"
-echo -e "18"	> step.txt
 
 ceate_welcome_message:
 echo -e "************************************************************"
