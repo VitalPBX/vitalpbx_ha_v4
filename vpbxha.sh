@@ -1303,10 +1303,8 @@ vitalpbx_create_mariadbfix:
 echo -e "************************************************************"
 echo -e "*           Creating VitalPBX mariadbfix Command           *"
 echo -e "************************************************************"
-wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/master/mariadbfix
-yes | cp -fr mariadbfix /usr/local/bin/mariadbfix
-yes | cp -fr config.txt /usr/local/bin/config.txt
-chmod +x /usr/local/bin/mariadbfix
+wget https://raw.githubusercontent.com/VitalPBX/vitalpbx_ha_v4/master/mariadbfix.sh
+chmod +x /usr/local/bin/mariadbfix.sh
 echo -e "*** Done Step 18 ***"
 echo -e "18"	> step.txt
 
