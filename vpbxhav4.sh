@@ -849,6 +849,7 @@ EOF
 ssh root@$ip_standby "rm -rf /etc/mysql/mariadb.conf.d/60-galera.cnf"
 scp /tmp/60-galera.cnf root@$ip_standby:/etc/mysql/mariadb.conf.d/60-galera.cnf
 sleep 5
+ssh root@$ip_standby "systemctl start mariadb"
 galera_new_cluster
 systemctl stop mariadb
 systemctl start mariadb
