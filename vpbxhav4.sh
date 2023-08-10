@@ -252,7 +252,10 @@ case $step in
 	4)
 		start="create_lsyncd_config_file"
   	;;
-	5)
+   	5)
+		start="create_mariadb_galera"
+  	;;
+	6)
 		start="create_hacluster_password"
   	;;
 	7)
@@ -783,6 +786,74 @@ EOF
 scp /tmp/lsyncd.conf.lua root@$ip_standby:/etc/lsyncd/lsyncd.conf.lua
 echo -e "*** Done Step 5 ***"
 echo -e "5"	> step.txt
+
+create_mariadb_galera:
+echo -e "************************************************************"
+echo -e "*                Create mariadb replica                    *"
+echo -e "************************************************************"
+#Enable chrony service
+systemctl start chrony
+systemctl enable chrony
+ssh root@$ip_standby "systemctl start chrony"
+ssh root@$ip_standby "systemctl enable chrony"
+rm -rf /etc/mysql/mariadb.conf.d/50-server.cnf
+cat > /etc/mysql/mariadb.conf.d/50-server.cnf << EOF
+[galera]
+# Mandatory settings
+wsrep_on                 = ON
+wsrep_cluster_name       = "VitalPBX Galera Cluster"
+wsrep_cluster_address    = gcomm://$ip_master,$ip_standby
+binlog_format            = row
+default_storage_engine   = InnoDB
+innodb_autoinc_lock_mode = 2
+
+# Allow server to accept connections on all interfaces.
+bind-address = 0.0.0.0
+
+# Galera Provider Configuration
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+
+# Galera Synchronization Configuration
+wsrep_sst_method=rsync
+
+# Galera Node Configuration
+wsrep_node_address=$ip_master
+wsrep_node_name="vpbx_node1"
+EOF
+
+cat > /tmp/50-server.cnf << EOF
+[galera]
+# Mandatory settings
+wsrep_on                 = ON
+wsrep_cluster_name       = "VitalPBX Galera Cluster"
+wsrep_cluster_address    = gcomm://$ip_master,$ip_standby
+binlog_format            = row
+default_storage_engine   = InnoDB
+innodb_autoinc_lock_mode = 2
+
+# Allow server to accept connections on all interfaces.
+bind-address = 0.0.0.0
+
+# Galera Provider Configuration
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+
+# Galera Synchronization Configuration
+wsrep_sst_method=rsync
+
+# Galera Node Configuration
+wsrep_node_address=$ip_standby
+wsrep_node_name="vpbx_node2"
+EOF
+
+ssh root@$ip_standby "rm -rf /etc/mysql/mariadb.conf.d/50-server.cnf"
+scp /tmp/50-server.cnf root@$ip_standby:/etc/mysql/mariadb.conf.d/50-server.cnf
+galera_new_cluster
+systemctl stop mariadb
+systemctl start mariadb
+ssh root@$ip_standby "systemctl stop mariadb"
+ssh root@$ip_standby "systemctl start mariadb"
+echo -e "*** Done Step 6 ***"
+echo -e "6"	> step.txt
 
 create_hacluster_password:
 echo -e "************************************************************"
