@@ -1,3 +1,7 @@
+[!WARNING] 
+Due to a deficiency of MariaDB in the replication option that makes it easy to lose synchronization of the databases, we decided to use DRBD, for which we recommend the following method instead of this one.
+https://github.com/VitalPBX/vitalpbx4_drbd_ha
+
 VitalPBX High Availability (Version 4)
 =====
 High availability is a characteristic of a system which aims to ensure an agreed level of operational performance, usually uptime, for a higher than normal period.<br>
