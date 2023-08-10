@@ -327,9 +327,13 @@ echo -e "************************************************************"
 #Create temporal Firewall Rules in Server 1 and 2
 firewall-cmd --permanent --add-service=high-availability
 firewall-cmd --permanent --zone=public --add-port=3306/tcp
+firewall-cmd --permanent --zone=public --add-port=4444/tcp
+firewall-cmd --permanent --zone=public --add-port=4567-4569/tcp
 firewall-cmd --reload
 ssh root@$ip_standby "firewall-cmd --permanent --add-service=high-availability"
 ssh root@$ip_standby "firewall-cmd --permanent --zone=public --add-port=3306/tcp"
+ssh root@$ip_standby "firewall-cmd --permanent --zone=public --add-port=4444/tcp"
+ssh root@$ip_standby "firewall-cmd --permanent --zone=public --add-port=4567-4569/tcp"
 ssh root@$ip_standby "firewall-cmd --reload"
 
 echo -e "************************************************************"
