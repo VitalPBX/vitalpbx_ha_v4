@@ -797,8 +797,8 @@ systemctl start chrony
 systemctl enable chrony
 ssh root@$ip_standby "systemctl start chrony"
 ssh root@$ip_standby "systemctl enable chrony"
-rm -rf /etc/mysql/mariadb.conf.d/50-server.cnf
-cat > /etc/mysql/mariadb.conf.d/50-server.cnf << EOF
+rm -rf /etc/mysql/mariadb.conf.d/60-galera.cnf
+cat > /etc/mysql/mariadb.conf.d/60-galera.cnf << EOF
 [galera]
 # Mandatory settings
 wsrep_on                 = ON
@@ -822,7 +822,7 @@ wsrep_node_address=$ip_master
 wsrep_node_name="vpbx_node1"
 EOF
 
-cat > /tmp/50-server.cnf << EOF
+cat > /tmp/60-galera.cnf << EOF
 [galera]
 # Mandatory settings
 wsrep_on                 = ON
@@ -846,8 +846,8 @@ wsrep_node_address=$ip_standby
 wsrep_node_name="vpbx_node2"
 EOF
 
-ssh root@$ip_standby "rm -rf /etc/mysql/mariadb.conf.d/50-server.cnf"
-scp /tmp/50-server.cnf root@$ip_standby:/etc/mysql/mariadb.conf.d/50-server.cnf
+ssh root@$ip_standby "rm -rf /etc/mysql/mariadb.conf.d/60-galera.cnf"
+scp /tmp/50-server.cnf root@$ip_standby:/etc/mysql/mariadb.conf.d/60-galera.cnf
 galera_new_cluster
 systemctl stop mariadb
 systemctl start mariadb
