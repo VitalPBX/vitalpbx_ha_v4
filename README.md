@@ -1,5 +1,6 @@
 ### :warning:<strong>Important notes:</strong></span><br>
 Due to a deficiency of MariaDB in the replication option that makes it easy to lose synchronization of the databases, we decided to use DRBD, for which we recommend the following method instead of this one.<br>
+
 https://github.com/VitalPBX/vitalpbx4_drbd_ha
 
 VitalPBX High Availability (Version 4)
