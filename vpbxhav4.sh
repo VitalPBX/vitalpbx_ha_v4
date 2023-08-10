@@ -918,14 +918,10 @@ echo -e "*             Disable Services in Server 1 and 2           *"
 echo -e "************************************************************"
 systemctl disable asterisk
 systemctl stop asterisk
-systemctl disable mariadb
-systemctl stop mariadb
 systemctl disable lsyncd
 systemctl stop lsyncd
 ssh root@$ip_standby "systemctl disable asterisk"
 ssh root@$ip_standby "systemctl stop asterisk"
-ssh root@$ip_standby "systemctl disable mariadb"
-ssh root@$ip_standby "systemctl stop mariadb"
 ssh root@$ip_standby "systemctl disable lsyncd"
 ssh root@$ip_standby "systemctl stop lsyncd"
 echo -e "*** Done Step 13 ***"
