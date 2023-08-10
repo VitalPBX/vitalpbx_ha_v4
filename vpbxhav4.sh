@@ -958,7 +958,7 @@ pcs resource create lsyncd service:lsyncd.service op monitor interval=30s
 pcs cluster cib fs_cfg
 pcs cluster cib-push fs_cfg --config
 pcs -f fs_cfg constraint colocation add lsyncd with virtual_ip INFINITY
-pcs -f fs_cfg constraint order mariadb then lsyncd
+pcs -f fs_cfg constraint order asterisk then lsyncd
 pcs cluster cib-push fs_cfg --config
 echo -e "*** Done Step 14 ***"
 echo -e "14"	> step.txt
