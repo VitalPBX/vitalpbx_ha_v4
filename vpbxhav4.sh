@@ -818,7 +818,7 @@ wsrep_provider=/usr/lib/galera/libgalera_smm.so
 wsrep_sst_method=rsync
 
 # Galera Node Configuration
-wsrep_node_address=$ip_master
+wsrep_node_address="$ip_master"
 wsrep_node_name="vpbx_node1"
 EOF
 
@@ -842,13 +842,14 @@ wsrep_provider=/usr/lib/galera/libgalera_smm.so
 wsrep_sst_method=rsync
 
 # Galera Node Configuration
-wsrep_node_address=$ip_standby
+wsrep_node_address="$ip_standby"
 wsrep_node_name="vpbx_node2"
 EOF
 
 ssh root@$ip_standby "rm -rf /etc/mysql/mariadb.conf.d/60-galera.cnf"
 scp /tmp/60-galera.cnf root@$ip_standby:/etc/mysql/mariadb.conf.d/60-galera.cnf
 galera_new_cluster
+slep 5
 systemctl stop mariadb
 systemctl start mariadb
 ssh root@$ip_standby "systemctl stop mariadb"
