@@ -896,6 +896,8 @@ echo -e "************************************************************"
 pcs resource create virtual_ip ocf:heartbeat:IPaddr2 ip=$ip_floating cidr_netmask=$ip_floating_mask op monitor interval=30s on-fail=restart
 pcs cluster cib drbd_cfg
 pcs cluster cib-push drbd_cfg
+#Prevent Resources from Moving after Recovery
+pcs resource defaults update resource-stickiness=INFINITY
 echo -e "*** Done Step 12 ***"
 echo -e "11"	> step.txt
 
