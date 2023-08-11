@@ -798,8 +798,9 @@ rm -rf /etc/mysql/mariadb.conf.d/60-galera.cnf
 cat > /etc/mysql/mariadb.conf.d/60-galera.cnf << EOF
 [galera]
 # Mandatory settings
-wsrep_on                 = ON
+wsrep_on                 = 1
 wsrep_cluster_name       = "VitalPBX Galera Cluster"
+wsrep_provider		 = /usr/lib/galera/libgalera_smm.so
 wsrep_cluster_address    = gcomm://$ip_master,$ip_standby
 binlog_format            = row
 default_storage_engine   = InnoDB
@@ -807,23 +808,15 @@ innodb_autoinc_lock_mode = 2
 
 # Allow server to accept connections on all interfaces.
 bind-address = 0.0.0.0
-
-# Galera Provider Configuration
-wsrep_provider=/usr/lib/galera/libgalera_smm.so
-
-# Galera Synchronization Configuration
-wsrep_sst_method=rsync
-
-# Galera Node Configuration
 wsrep_node_address="$ip_master"
-wsrep_node_name="vpbx_node1"
 EOF
 
 cat > /tmp/60-galera.cnf << EOF
 [galera]
 # Mandatory settings
-wsrep_on                 = ON
+wsrep_on                 = 1
 wsrep_cluster_name       = "VitalPBX Galera Cluster"
+wsrep_provider		 = /usr/lib/galera/libgalera_smm.so
 wsrep_cluster_address    = gcomm://$ip_master,$ip_standby
 binlog_format            = row
 default_storage_engine   = InnoDB
@@ -831,16 +824,7 @@ innodb_autoinc_lock_mode = 2
 
 # Allow server to accept connections on all interfaces.
 bind-address = 0.0.0.0
-
-# Galera Provider Configuration
-wsrep_provider=/usr/lib/galera/libgalera_smm.so
-
-# Galera Synchronization Configuration
-wsrep_sst_method=rsync
-
-# Galera Node Configuration
 wsrep_node_address="$ip_standby"
-wsrep_node_name="vpbx_node2"
 EOF
 
 ssh root@$ip_standby "rm -rf /etc/mysql/mariadb.conf.d/60-galera.cnf"
