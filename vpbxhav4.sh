@@ -810,8 +810,9 @@ innodb_autoinc_lock_mode = 2
 bind-address = 0.0.0.0
 wsrep_node_address=$ip_master
 EOF
+sleep 2
 galera_new_cluster
-systemctl restart mariadb.service
+systemctl start mariadb.service
 
 cat > /tmp/60-galera.cnf << EOF
 [galera]
@@ -831,6 +832,7 @@ EOF
 
 ssh root@$ip_standby "rm -rf /etc/mysql/mariadb.conf.d/60-galera.cnf"
 scp /tmp/60-galera.cnf root@$ip_standby:/etc/mysql/mariadb.conf.d/60-galera.cnf
+sleep 2
 ssh root@$ip_standby "systemctl restart mariadb.service"
 echo -e "*** Done Step 6 ***"
 echo -e "6"	> step.txt
