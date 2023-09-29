@@ -1023,6 +1023,7 @@ log_bin		= /var/log/mysql/mariadb-bin
 log_bin_index	= /var/log/mysql/mariadb-bin.index
 relay_log	= /var/log/mysql/relay-bin
 relay_log_index	= /var/log/mysql/relay-bin.index
+slave-skip-errors = 1062
 
 #
 # * Basic Settings
