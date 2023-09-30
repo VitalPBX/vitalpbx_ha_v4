@@ -1,5 +1,5 @@
 ### :warning:<strong>Important notes (Read before proceeding):</strong></span><br>
-If you already have your PBX in production and want to add High Availability, this method is the one you should use. However, the DRBD method is more recommended.<br>
+If you already have your PBX in production and want to add High Availability, this method is the one you should use. However, the DRBD method is more recommended, which you can find in the following link:.<br>
 https://github.com/VitalPBX/vitalpbx4_drbd_ha
 
 VitalPBX High Availability (Version 4)
